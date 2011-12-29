@@ -1,0 +1,8 @@
+This is a set of libraries and recipes I used to free myself of chef-server, while still using chef in a coordinated fashion.
+
+In short, I replaced chef-server with simpledb.
+
+This code has been sloppily extracted from my work repository, so there's probably going to be a lot of missing attribute errors. I'll try and fix them... eventually...
+
+This code has graciously been open-sourced by my former employer Geodelic.
+

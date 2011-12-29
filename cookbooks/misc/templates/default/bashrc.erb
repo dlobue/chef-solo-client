@@ -1,0 +1,94 @@
+
+export PATH=$PATH:/home/ec2/bin
+export EC2_HOME=/home/ec2
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+    . /etc/bashrc
+fi
+
+# Source dist definitions
+if [ -f /etc/skel/.bashrc ]; then
+    . /etc/skel/.bashrc
+fi
+
+#
+#make the server more homey
+#
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+    . /etc/bash_completion
+fi
+
+export HISTIGNORE="&"
+export HISTFILESIZE=100000000000
+export HISTSIZE=100000000000
+export PROMPT_COMMAND="history -a"
+export HISTTIMEFORMAT='%a %T '
+export HISTCONTROL=ignoreboth
+export PAGER=less
+export LESS=FXR
+export EDITOR=vim
+
+shopt -s histappend
+shopt -s cdspell
+shopt -s dotglob
+shopt -s extglob
+set -o vi
+
+
+no_color="\[\033[0m\]"
+
+
+light_blue="\[\033[1;34m\]"
+green="\[\033[0;32m\]"
+light_green="\[\033[1;32m\]"
+cyan="\[\033[0;36m\]"
+light_cyan="\[\033[1;36m\]"
+red="\[\033[0;31m\]"
+light_red="\[\033[1;31m\]"
+purple="\[\033[0;35m\]"
+light_purple="\[\033[1;35m\]"
+brown="\[\033[0;33m\]"
+
+zero=$light_blue
+one=$green
+two=$red
+three=$cyan
+four=$purple
+five=$brown
+six=$light_green
+seven=$light_cyan
+eight=$light_purple
+nine=$light_red
+ten=$zero
+eleven=$one
+twelve=$two
+thirteen=$three
+fourteen=$four
+fifteen=$five
+sixteen=$six
+seventeen=$seven
+eighteen=$eight
+nineteen=$nine
+
+#for one-offs
+dark_gray="\[\033[1;30m\]"
+none=$dark_gray
+
+
+PS1="${light_blue}\u${no_color}@${<%=node.ver_minor%>}\h<%="." + node.rs_deployment if node.attribute?("rs_deployment")%>${no_color} ${light_green}\w \$${no_color} "
+export PS1
+
+export PATH=$PATH:/usr/local/bin:/opt/splunk/bin
+
+alias grpe=grep
+alias pgrpe=pgrep
+alias screen='TERM=screen screen'
+
+export BUCKET=<%=node.env.s3_bucket%>
+export FOLDER=<%=node.env.s3_folder%>
+
+if [ -f ~/.aws_creds ]; then
+    . ~/.aws_creds
+fi
+

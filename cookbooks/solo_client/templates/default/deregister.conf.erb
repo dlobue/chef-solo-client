@@ -1,0 +1,6 @@
+
+start on shutdown
+task
+
+exec chef-solo -j <%=node.delete_me_attribs%>
+

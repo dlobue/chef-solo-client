@@ -1,0 +1,3 @@
+
+deb s3://<%="#{node.aws_access_key_id}:[#{node.aws_secret_access_key}]@" if node.continuous_deployment%>s3.amazonaws.com/<%=node.apt.bucket%> <%=node.apt.distro%> <%=node.apt.components.join(' ')%>
+
