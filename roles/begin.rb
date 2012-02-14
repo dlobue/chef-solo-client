@@ -8,7 +8,6 @@ run_list(
     "recipe[solo_client::auto_restart_chef]",
     "recipe[solo_client::apt]",
     "recipe[misc::default]",
-    "recipe[solo_client::make_available]"
-    "recipe[solo_client::last_call]"
+    "recipe[solo_client::begin_end_hub]"
 )
 
