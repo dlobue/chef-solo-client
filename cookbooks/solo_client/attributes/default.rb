@@ -3,6 +3,7 @@
 default.current_user = "root" if current_user.nil?
 default.fqdn = 'localhost'
 default.deployment = 'development'
+default.traits = []
 
 default.delete_me_attribs = '/root/delete_me.rb'
 default.pubkey_folder = 'public_keys'
