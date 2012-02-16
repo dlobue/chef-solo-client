@@ -1,9 +1,12 @@
 
+include_recipe 'apt::recommends'
+
 execute "apt-get update" do
   action :nothing
 end
 
 execute "add apt key" do
+  only_if { node.apt.repo_key }
   command "apt-key adv --keyserver keyserver.ubuntu.com --recv #{node.apt.repo_key}"
   action :nothing
 end

@@ -1,0 +1,5 @@
+
+// Recommends are as of now still abused in many packages
+APT::Install-Recommends "<%=node.apt.install_recommends ? 1 : 0 %>";
+APT::Install-Suggests "<%=node.apt.install_suggests ? 1 : 0 %>";
+
