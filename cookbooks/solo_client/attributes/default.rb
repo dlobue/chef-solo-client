@@ -2,6 +2,7 @@
 #default.current_user = Etc.getpwuid(Process.uid).name if current_user.nil? #not 100% this will work, and the below method is good enough
 default.current_user = "root" if current_user.nil?
 default.fqdn = 'localhost'
+default.deployment = 'development'
 
 default.delete_me_attribs = '/root/delete_me.rb'
 default.pubkey_folder = 'public_keys'

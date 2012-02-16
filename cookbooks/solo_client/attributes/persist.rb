@@ -12,7 +12,7 @@ else
 end
 
 persist[:state] ||= 'pending'
-persist[:deployment] = rs_deployment unless (persist[:deployment] == rs_deployment) #TODO: change me
+persist[:deployment] = deployment unless (persist[:deployment] == deployment)
 persist[:traits] = traits unless (persist[:traits] == traits)
 
 persist[:fqdn] ||= fqdn
