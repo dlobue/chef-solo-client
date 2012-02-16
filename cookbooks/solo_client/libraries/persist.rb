@@ -94,14 +94,6 @@ end
 class PersistError < RuntimeError
 end
 
-def get_creds
-    fname = "/root/.telegraph.cfg"
-    f = File.open(fname)
-    creds = Hash[f.map { |line| line.split("=").map { |str| str.strip() } }]
-    f.close()
-    return creds
-end
-
 
 class PersistWrapper
     @@pbackend = nil
@@ -135,7 +127,6 @@ class FogSimpleDBWrapper
         end
         @@collection = collection
         @@node_name = node_name
-        creds = get_creds()
         sdb_host = case ec2_region
           when 'ap-northeast-1'
             'sdb.ap-northeast-1.amazonaws.com'
@@ -148,9 +139,7 @@ class FogSimpleDBWrapper
           when 'us-west-1'
             'sdb.us-west-1.amazonaws.com'
           end
-        fog = Fog::AWS::SimpleDB.new( #:host => sdb_host,
-                                     :aws_access_key_id => creds["s3_access_key"],
-                                     :aws_secret_access_key => creds["s3_secret_key"])
+        fog = Fog::AWS::SimpleDB.new( get_creds() )
         @@sdb = FogRetryProxy.new(fog)
     end
 
