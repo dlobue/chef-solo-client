@@ -2,7 +2,7 @@
 default.misc.egg_script_dir = '/usr/bin'
 default.misc.distutils_conf_file = '/root/.pydistutils.cfg'
 
-default.geo_ver_minor = 'none'
+default.ver_minor = 'none'
 default.mounts = {}
 
 default.misc.users = ['root'] + [
