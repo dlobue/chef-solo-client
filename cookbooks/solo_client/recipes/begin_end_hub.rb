@@ -10,7 +10,6 @@ end
 
 ruby_block "make_available" do
     action :nothing
-    not_if { node.envswitch == "development" or not node.not_dev }
     block do
         node[:persist][:state] = "available" unless node[:persist][:state] == "available"
     end

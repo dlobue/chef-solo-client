@@ -7,7 +7,6 @@ cookbooks_path = Array(Chef::Config[:cookbook_path]).detect{|e| e =~ /\/cookbook
 git_hooks_path = File.expand_path(File.join(cookbooks_path, '..', '.git', 'hooks'))
 
 cookbook_file "#{git_hooks_path}/post-merge" do
-    not_if { node.envswitch == "development" or node.continuous_deployment or not node.not_dev }
     only_if { File.exists?(git_hooks_path) }
     source "chef-repo_git-hook_post-merge"
     owner "root"
