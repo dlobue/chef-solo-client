@@ -17,6 +17,7 @@ action :run do
     storage = Fog::Storage.new(get_creds().merge(:provider => 'AWS'))
     bucket = storage.directories.get(node.env.s3_bucket)
 
+    # First, see if there is a new archive to download.
     artifacts = bucket.files.all(
         :prefix => [node.env.s3_folder, new_resource.artifact].join('/')
     ).to_a.select{ |k|
@@ -27,23 +28,6 @@ action :run do
 
     artifact = artifacts[0]
     fileName = artifact.key.split('/')[-1]
-
-    # First, see if there is a new archive to download.
-    if node.chef_packages.chef.version.split('.')[1].to_i < 10
-        cmd = "telegraph list_artifact #{node[:env][:s3_bucket]} #{node[:env][:s3_folder]} #{new_resource.artifact}"
-        Chef::Log.debug("cmd: #{cmd}")
-        output = `#{cmd}`
-        if $?.to_i != 0
-            raise "telegraph error:\n#{output}"
-        end
-        fileName = output.strip.split("\t")[0]
-    else
-        cmd = Chef::ShellOut.new("telegraph list_artifact #{node[:env][:s3_bucket]} #{node[:env][:s3_folder]} #{new_resource.artifact}")
-        cmd.run_command
-        cmd.error!
-        fileName = cmd.stdout.strip.split("\t")[0]
-    end
-
 
     archivePath = node[:env][:archive_dir] + fileName
     createsPath = new_resource.creates.start_with?('/') ? new_resource.creates : ::File.join(new_resource.container_path, new_resource.creates)
