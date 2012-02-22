@@ -1,7 +1,10 @@
 
+cookbook_dir = Array(Chef::Config[:cookbook_path]).detect{|e| e =~ /\/cookbooks\/*$/ }
+
 solo_client_untar_from_s3 "creds" do
     user "root"
-    container_path Array(Chef::Config[:cookbook_path]).detect{|e| e =~ /\/cookbooks\/*$/ }
+    container_path cookbook_dir
+    creates File.join(cookbook_dir, 'cred_cookbook')
     notifies :create, "ruby_block[apply_creds]", :immediately
 end
 
