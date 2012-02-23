@@ -30,7 +30,7 @@ action :run do
     fileName = artifact.key.split('/')[-1]
 
     archivePath = node[:env][:archive_dir] + fileName
-    createsPath = new_resource.creates.start_with?('/') ? new_resource.creates : ::File.join(new_resource.container_path, new_resource.creates)
+    createsPath = new_resource.creates.to_s.start_with?('/') ? new_resource.creates.to_s : ::File.join(new_resource.container_path, new_resource.creates)
 
     #TODO: cleanup old and failed versions.
     #download block
