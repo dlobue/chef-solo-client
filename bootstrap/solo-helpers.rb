@@ -83,7 +83,8 @@ Chef::Client.before_starting_run do |json_attribs|
         cmd = "git branch | "
         cmd << "awk '/^\\*/{ if ($NF == \"#{git_branch.gsub('.','\.')}\" ) { exit 2 }}' && "
         cmd << "git checkout #{git_branch.gsub('.','\.')}; "
-        cmd << "git pull"
+        cmd << "git pull && "
+        cmd << "git submodule update --init --recursive"
 
         Chef::Mixin::Command.run_command(:command => cmd,
                                          :cwd => cookbooks_path)
@@ -91,9 +92,12 @@ Chef::Client.before_starting_run do |json_attribs|
     else
         repo_path = File.expand_path(File.join(cookbooks_path, '..'))
         Chef::Log.debug("Appears the chef repo was never downloaded. Cloning the repo from #{git_repo} into #{repo_path}.")
+
+        #Chef::Mixin::Command.run_command(:command => "git clone --recursive -b #{git_branch} #{git_repo} #{repo_path}")
         Chef::Mixin::Command.run_command(:command => "git clone #{git_repo} #{repo_path}")
+
         Chef::Log.debug("Make sure we're on the right branch - checking out branch #{git_branch}.")
-        Chef::Mixin::Command.run_command(:command => "git checkout #{git_branch}",
+        Chef::Mixin::Command.run_command(:command => "git checkout #{git_branch} && git submodule update --init --recursive",
                                          :cwd => cookbooks_path)
     end
 end
