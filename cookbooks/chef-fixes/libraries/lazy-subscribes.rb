@@ -20,6 +20,12 @@ class Chef::Runner
       #end
   #end
 
+  alias _run_action run_action
+  def run_action(resource, action)
+    resource.resolve_notification_references
+    _run_action(resource, action)
+  end
+
   def converge
       run_context.subscription_queue = Array.new if run_context.subscription_queue.nil?
       run_context.subscription_queue.each do |notification_spec|
