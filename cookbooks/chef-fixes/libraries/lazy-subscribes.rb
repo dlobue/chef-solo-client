@@ -44,6 +44,12 @@ class Chef::Runner
           Array(resource.action).each {|action| run_action(resource, action)}
         rescue => e
           Chef::Log.error("#{resource} (#{resource.source_line}) had an error:\n#{e}\n#{e.backtrace.join("\n")}")
+          if resource.retries > 0
+            resource.retries -= 1
+            Chef::Log.info("Retrying execution of #{resource}, #{resource.retries} attempt(s) left")
+            sleep resource.retry_delay
+            retry
+          end
           raise e unless resource.ignore_failure
         end
       end
