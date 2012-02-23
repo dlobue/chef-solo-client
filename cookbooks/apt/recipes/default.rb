@@ -3,6 +3,7 @@ include_recipe 'apt::recommends'
 
 execute "apt-get update" do
   action :nothing
+  retries 3
 end
 
 execute "add apt key" do
