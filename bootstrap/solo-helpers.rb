@@ -55,6 +55,7 @@ Chef::Client.before_starting_run do |json_attribs|
     git_repo = Chef::Config[:git_repo]
     Chef::Log.info("Pulling down latest chef recipes in branch #{git_branch} from repo #{git_repo}.")
     cookbooks_path = Array(Chef::Config[:cookbook_path]).detect{|e| e =~ /\/cookbooks\/*$/ }
+    repo_path = File.expand_path(File.join(cookbooks_path, '..'))
     if File.exists? cookbooks_path
         Chef::Log.debug("Looks like the repo already exists on disk. Checking to see if our branch is on the disk; if not perform a fetch.")
         #so i can follow the below command in the future:
@@ -72,7 +73,7 @@ Chef::Client.before_starting_run do |json_attribs|
         Chef::Mixin::Command.run_command(:command => cmd,
                                          :returns => [0,3],
                                          :output_on_failure => true,
-                                         :cwd => cookbooks_path)
+                                         :cwd => repo_path)
 
         Chef::Log.debug("Make sure we're on the right branch - if not check out branch #{git_branch}. Lastly perform a pull.")
         #so i can follow the below command in the future:
@@ -89,10 +90,9 @@ Chef::Client.before_starting_run do |json_attribs|
 
         Chef::Mixin::Command.run_command(:command => cmd,
                                          :output_on_failure => true,
-                                         :cwd => cookbooks_path)
+                                         :cwd => repo_path)
 
     else
-        repo_path = File.expand_path(File.join(cookbooks_path, '..'))
         Chef::Log.debug("Appears the chef repo was never downloaded. Cloning the repo from #{git_repo} into #{repo_path}.")
 
         #Chef::Mixin::Command.run_command(:command => "git clone --recursive -b #{git_branch} #{git_repo} #{repo_path}")
@@ -102,7 +102,7 @@ Chef::Client.before_starting_run do |json_attribs|
         Chef::Log.debug("Make sure we're on the right branch - checking out branch #{git_branch}.")
         Chef::Mixin::Command.run_command(:command => "git checkout #{git_branch} && git submodule update --init --recursive",
                                          :output_on_failure => true,
-                                         :cwd => cookbooks_path)
+                                         :cwd => repo_path)
     end
 end
 
