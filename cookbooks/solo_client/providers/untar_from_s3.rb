@@ -43,7 +43,7 @@ action :run do
     else
         Chef::Log.info("downloading new archive to #{archivePath}")
         begin
-            File.open(archivePath, 'w') {|local_file|
+            ::File.open(archivePath, 'w') {|local_file|
                 local_file.write(artifact.body)} 
         rescue Chef::Exceptions::Exec => e
             ::File.delete( archivePath )
