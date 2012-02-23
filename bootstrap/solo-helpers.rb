@@ -71,6 +71,7 @@ Chef::Client.before_starting_run do |json_attribs|
         cmd << "( git fetch && git checkout #{git_branch} ) "
         Chef::Mixin::Command.run_command(:command => cmd,
                                          :returns => [0,3],
+                                         :output_on_failure => true,
                                          :cwd => cookbooks_path)
 
         Chef::Log.debug("Make sure we're on the right branch - if not check out branch #{git_branch}. Lastly perform a pull.")
@@ -87,6 +88,7 @@ Chef::Client.before_starting_run do |json_attribs|
         cmd << "git submodule update --init --recursive"
 
         Chef::Mixin::Command.run_command(:command => cmd,
+                                         :output_on_failure => true,
                                          :cwd => cookbooks_path)
 
     else
@@ -94,10 +96,12 @@ Chef::Client.before_starting_run do |json_attribs|
         Chef::Log.debug("Appears the chef repo was never downloaded. Cloning the repo from #{git_repo} into #{repo_path}.")
 
         #Chef::Mixin::Command.run_command(:command => "git clone --recursive -b #{git_branch} #{git_repo} #{repo_path}")
-        Chef::Mixin::Command.run_command(:command => "git clone #{git_repo} #{repo_path}")
+        Chef::Mixin::Command.run_command(:command => "git clone #{git_repo} #{repo_path}",
+                                         :output_on_failure => true)
 
         Chef::Log.debug("Make sure we're on the right branch - checking out branch #{git_branch}.")
         Chef::Mixin::Command.run_command(:command => "git checkout #{git_branch} && git submodule update --init --recursive",
+                                         :output_on_failure => true,
                                          :cwd => cookbooks_path)
     end
 end
