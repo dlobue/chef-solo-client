@@ -6,7 +6,6 @@ if attribute?("do_multi") and do_multi
     persist[:ec2_public_hostname] = ec2[:public_hostname] unless (persist[:ec2_public_hostname] == ec2[:public_hostname])
     persist[:ec2_instance_id] = ec2[:instance_id] unless (persist[:ec2_instance_id] == ec2[:instance_id])
     persist[:ec2_region] = ec2[:region] unless (persist[:ec2_region] == ec2[:region])
-    persist[:mounts] = [root_dir]
 else
     persist Mash.new()
 end
