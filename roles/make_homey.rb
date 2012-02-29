@@ -4,6 +4,7 @@ description "recipes to make things more home-like"
 
 run_list(
     "misc::bashrc",
-    "misc::dotssh"
+    "misc::dotssh",
+    "misc::base_pkgs"
 )
 
