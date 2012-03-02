@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 
+import argparse
 import hashlib
 import os
 import sys
@@ -15,7 +16,7 @@ def get_deployment_pubkeys():
         keyid = line.split('=')[0].strip()
         yield urllib2.urlopen(pubkeyurl + keyid + '/openssh-key').read().strip()
 
-def update_authorized_keys(pubkey_bucket, pubkey_prefix, user):
+def update_authorized_keys(pubkey_bucket, pubkey_prefix, user, include_deployment_keys=False):
     s3conn = boto.connect_s3()
     try:
         bucket = s3conn.get_bucket(pubkey_bucket)
@@ -53,8 +54,9 @@ def update_authorized_keys(pubkey_bucket, pubkey_prefix, user):
         localpubkeys.append(filePath)
 
     with open(authorized_keys, 'w') as f:
-        for pubkey in get_deployment_pubkeys():
-            f.write(pubkey + '\n')
+        if include_deployment_keys:
+            for pubkey in get_deployment_pubkeys():
+                f.write(pubkey + '\n')
 
         for pubkey in localpubkeys:
             with open(pubkey) as pk:
@@ -71,5 +73,12 @@ def md5sum(filePath):
     return h.hexdigest()
 
 if __name__ == '__main__':
-    update_authorized_keys(sys.argv[1], sys.argv[2], sys.argv[3])
+    parser = argparse.ArgumentParser()
+    parser.add_argument('pubkey_bucket')
+    parser.add_argument('pubkey_prefix')
+    parser.add_argument('user')
+    parser.add_argument('-d', dest="include_deployment_keys", action='store_true')
+    args = parser.parse_args()
+
+    update_authorized_keys(args.pubkey_bucket, args.pubkey_prefix, args.user, args.include_deployment_keys)
 
