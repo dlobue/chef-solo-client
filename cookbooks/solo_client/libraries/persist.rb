@@ -222,14 +222,14 @@ class FogSimpleDBWrapper
         Chef::Log.debug("Querying simpledb with >#{q}<")
         #TODO: add in retry logic
         response = @@sdb._select(q, next_token, true)
-        Chef::Log.debug("Query found #{response.body['Items'].length} results")
         if response.status != 200
             raise PersistError, "Something went wrong while querying simpledb! Got response code #{response.status}. Response body: #{response.body}"
         end
+        Chef::Log.debug("Query found #{response.body['Items'].length} results")
         if attributes.strip == "count(*)"
             return response.body['Items']['Domain']['Count'][0].to_i
         end
-        return response.body['Items'].values.map { |result| Mash["persist" => value_flatten(result)] }
+        return response.body['Items'].values.map { |result| value_flatten(result) }
     end
 end
 
