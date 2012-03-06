@@ -2,5 +2,5 @@
 start on shutdown
 task
 
-exec chef-solo -j <%=node.delete_me_attribs%>
+exec /usr/local/bin/delete_sdb_record.py chef <%=@node.fqdn%>
 
