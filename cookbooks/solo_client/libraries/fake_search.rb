@@ -19,7 +19,10 @@ def fakesearch_nodes(nodeType, options = {})
         options[:traits] = nodeType
     end
     results = fakesearch(options)
-    return results.map { |result| Mash["persist" => result] }
+    if results.respond_to? :map
+        results = results.map { |result| Mash["persist" => result] }
+    end
+    return results
 end
 
 def fakesearch(options = {})
