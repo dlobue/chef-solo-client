@@ -39,9 +39,9 @@ def fakesearch(options = {})
             filters.push(nTq)
         end
     end
-    Chef::Log.debug("Fake-Searching #{nodeType} with query '#{filters.join(' and ')}'")
+    Chef::Log.debug("Fake-Searching query '#{filters.join(' and ')}'")
     results = PersistWrapper.search(filters.join(' and '), attributes)
-    Chef::Log.debug("Fake-Searching #{nodeType} returned #{results.length} entries") if results.kind_of? Array
+    Chef::Log.debug("Fake-Search returned #{results.length} entries") if results.kind_of? Array
     return results
 end
 
