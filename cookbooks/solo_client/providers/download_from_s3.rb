@@ -24,7 +24,7 @@ action :run do
     artifacts = bucket.files.all(
         :prefix => [node.env.s3_folder, new_resource.artifact].join('/')
     ).to_a.select{ |k|
-        not k.key.split('/')[-1].match(/.+-[^-]+\.t(ar\.)?(gz|bz2)/).nil?
+        not k.key.split('/')[-1].match(/.+-[^-]+\.(t(ar\.)?)?(gz|bz2)/).nil?
     }
 
     raise "no artifacts found!" if artifacts.empty?
