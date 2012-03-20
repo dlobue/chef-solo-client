@@ -1,6 +1,7 @@
 
 require 'fileutils'
 require 'md5'
+require 'fog'
 
 action :run do
 
@@ -14,6 +15,7 @@ action :run do
     Chef::Log.debug("untar_from_s3: artifact #{new_resource.artifact} to path #{new_resource.container_path}")
     Chef::Log.debug("untar_from_s3: user: #{user}")
 
+    #TODO: refactor into library so untar_from_s3 and download_from_s3 can reuse code
     storage = Fog::Storage.new(get_creds().merge(:provider => 'AWS'))
     bucket = storage.directories.get(node.env.s3_bucket)
 
