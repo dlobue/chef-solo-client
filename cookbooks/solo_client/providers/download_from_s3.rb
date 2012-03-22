@@ -48,7 +48,7 @@ action :run do
         begin
             ::File.open(archivePath, 'w') {|local_file|
                 local_file.write(artifact.body)}
-        rescue Chef::Exceptions::Exec => e
+        rescue => e
             ::File.delete( archivePath )
             raise e
         end
