@@ -96,9 +96,28 @@ class Chef::Resource
   end
 end
 
+class Chef::ChecksumCache
+  def generate_md5_checksum_for_file(file)
+    key = generate_key(file)
+    fstat = File.stat(file)
+    lookup_result = lookup_checksum(key, fstat)
+    return lookup_result if lookup_result
+
+
+    checksum = checksum_file(file, Digest::MD5.new)
+    moneta.store(key, {"mtime" => fstat.mtime.to_f, "checksum" => checksum})
+    validate_checksum(key)
+    checksum
+  end
+end
+
 
 class Chef::Provider
   class S3RemoteFile < Chef::Provider::RemoteFile
+
+    def checksum(file)
+      Chef::ChecksumCache.generate_md5_checksum_for_file(file)
+    end
 
     def action_create
       bucket = get_bucket
