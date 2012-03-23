@@ -130,12 +130,12 @@ class Chef::Provider
           backup_new_resource
           begin
               ::File.open(@new_resource.path, 'w') {|local_file|
-                  local_file.write(artifact.body)}
+                  local_file.write(remote_file.body)}
           rescue => e
               ::File.delete( @new_resource.path )
               raise e
           end
-          FileUtils.touch archivePath
+          FileUtils.touch @new_resource.path
           Chef::Log.info "#{@new_resource} updated"
           @new_resource.updated_by_last_action(true)
         end
