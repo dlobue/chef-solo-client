@@ -65,7 +65,7 @@ class Chef::Resource
       set_or_return(
         :folder,
         arg,
-        :kind_of => [ String, nil ]
+        :kind_of => [ String, NilClass ]
       )
     end
 
@@ -89,7 +89,7 @@ class Chef::Resource
       set_or_return(
         :delete_dir_in_container,
         arg,
-        :kind_of => [ String, nil ]
+        :kind_of => [ String, NilClass ]
       )
     end
 
