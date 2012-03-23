@@ -20,6 +20,14 @@ class Chef::Resource
       )
     end
 
+    def checksum(arg=nil)
+      set_or_return(
+        :checksum,
+        arg,
+        :regex => /^[a-zA-Z0-9]{32}$/
+      )
+    end
+
     def provider(arg=nil)
       Chef::Resource.instance_method(:provider).bind(self).call(arg)
     end
