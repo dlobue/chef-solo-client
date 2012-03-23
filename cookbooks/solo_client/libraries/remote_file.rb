@@ -8,6 +8,7 @@ class Chef::Resource
     def initialize(name, run_context=nil)
       super
       @resource_name = :s3_file
+      @provider = Chef::Provider::S3RemoteFile
       @bucket = nil
     end
 
@@ -19,6 +20,10 @@ class Chef::Resource
       )
     end
 
+    def provider(arg=nil)
+      Chef::Resource.instance_method(:provider).bind(self).call(arg)
+    end
+
   end
 end
 
@@ -28,6 +33,7 @@ class Chef::Resource
     def initialize(name, run_context=nil)
       super
       @resource_name = :s3_artifact
+      @provider = Chef::Provider::S3Artifact
       @artifact = nil
       @folder = nil
       @key_format = /.+-[^-]+\.(t(ar\.)?)?(gz|bz2)/
