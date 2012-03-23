@@ -5,6 +5,8 @@ default.fqdn = 'localhost'
 default.deployment = 'development'
 default.traits = []
 
+default.sdb_domain = "chef"
+
 default.env.archive_dir = "/var/cache/chef"
 
 default.delete_me_attribs = '/root/delete_me.rb'
