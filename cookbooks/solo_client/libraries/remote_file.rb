@@ -122,7 +122,7 @@ class Chef::Provider
         #storage = Fog::Storage.new(get_creds().merge(:provider => 'AWS'))
         #bucket = storage.directories.get(@new_resource.bucket)
 
-        remote_file = bucket.files.get(@new_resource.source)
+        remote_file = bucket.files.head(@new_resource.source)
 
         if same_as_current_file?(remote_file)
           Chef::Log.debug "#{@new_resource} target and source are the same - not updating"
