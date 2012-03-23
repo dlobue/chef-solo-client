@@ -20,8 +20,8 @@ class Chef::Resource
         [
           @command,
           event,
-          '--no-wait' unless wait,
-          variables.map { |i| i.join('=') } unless variables.nil? or variables.empty?
+          ('--no-wait' unless wait),
+          (variables.map { |i| i.join('=') } unless variables.nil? or variables.empty?)
         ].select { |x| not x.nil? }.join(' ')
       end
     end
