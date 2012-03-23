@@ -2,6 +2,16 @@
 require 'fileutils'
 require 'fog'
 
+class Chef::Resource::File
+    def checksum(arg=nil)
+      set_or_return(
+        :checksum,
+        arg,
+        :regex => /^[a-zA-Z0-9]{32,64}$/
+      )
+    end
+end
+
 class Chef::Resource
   class S3RemoteFile < Chef::Resource::RemoteFile
 
@@ -17,14 +27,6 @@ class Chef::Resource
         :bucket,
         arg,
         :kind_of => [ String ]
-      )
-    end
-
-    def checksum(arg=nil)
-      set_or_return(
-        :checksum,
-        arg,
-        :regex => /^[a-zA-Z0-9]{32}$/
       )
     end
 
