@@ -97,7 +97,7 @@ class Chef::Resource
 end
 
 
-class Chef::Provier
+class Chef::Provider
   class S3RemoteFile < Chef::Provider::RemoteFile
 
     def action_create
@@ -179,7 +179,7 @@ class Chef::Provier
   end
 end
 
-class Chef::Provier
+class Chef::Provider
   class S3Artifact < Chef::Provider::S3RemoteFile
     def action_create
       prefix = [@new_resource.folder, @new_resource.artifact].select {|x| not (x.nil? or x.empty?)}.join('/')
