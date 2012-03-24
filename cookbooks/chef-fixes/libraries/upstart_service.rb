@@ -1,5 +1,10 @@
 
 class Chef::Provider::Service::Upstart
+  alias _start_service start_service
+  alias _stop_service stop_service
+  alias _restart_service restart_service
+  alias _reload_service reload_service
+
   def update_service_status
     # Get running/stopped state
     # We do not support searching for a service via ps when using upstart since status is a native
@@ -31,22 +36,22 @@ class Chef::Provider::Service::Upstart
 
   def start_service
     update_service_status
-    super
+    _start_service
   end
 
   def stop_service
     update_service_status
-    super
+    _stop_service
   end
 
   def restart_service
     update_service_status
-    super
+    _restart_service
   end
 
   def reload_service
     update_service_status
-    super
+    _reload_service
   end
 end
 
