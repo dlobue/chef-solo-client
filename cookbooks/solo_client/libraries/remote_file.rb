@@ -219,9 +219,11 @@ class Chef::Provider
           :prefix => prefix
       ).to_a.select{ |k|
           not k.key.split('/')[-1].match(@new_resource.key_format).nil?
-      }
+      }.sort { |a,b| b.key <=> a.key }
 
       raise "no artifacts found!" if artifacts.empty?
+
+      Chef::Log.info("Newest artifact found is #{artifacts[0].key}")
 
       @new_resource.source(artifacts[0].key)
 
