@@ -2,6 +2,10 @@
 name "cloud"
 description "recipes that should always be run in the cloud"
 
+override_attributes(
+  "no_lockr_traits" => [ "cloud" ]
+)
+
 run_list(
   "recipe[solo_client::creds]",
   "role[_begin]",
