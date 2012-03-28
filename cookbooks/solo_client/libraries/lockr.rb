@@ -2,20 +2,24 @@
 class LockrError < RuntimeError
 end
 
+def _get_lockable_traits(node)
+    [node[:persist][:traits]].flatten - [node.attribute? "not_lockrable_traits" ? node[:not_lockrable_traits] : []].flatten
+end
+
+def _get_lock_list(node)
+    lockable_traits = _get_lockable_traits(node)
+    lock_list = Hash[lockable_traits.map {|trait| [trait, node[:persist][:fqdn]]}]
+    [lockable_traits, lock_list]
+end
+
 def acquire_lockr(node)
-    if node[:persist][:traits].kind_of? Array
-        lock_list = Hash[node[:persist][:traits].map {|trait| [trait, node[:persist][:fqdn]]}]
-    else
-        lock_list = {node[:persist][:traits] => node[:persist][:fqdn]}
-    end
+    lockable_traits, lock_list = _get_lock_list(node)
     Chef::Log.debug("Just stating: lock_list is >#{lock_list.inspect}>")
 
     trait_max = Hash[lock_list.map { |trait,fqdn|
         count = fakesearch(:traits => trait, :attributes => 'count(*)')/10
         [trait,(count unless count < 1) || 1]}]
     Chef::Log.debug("Max number of locks that can be acquired for each trait: >#{trait_max.inspect}>")
-    #trait_counts = Hash[lock_list.map {|n| [n,fakesearch_node(n, :attributes => 'count(*)')/3]}]
-    #trait_max = Mash[trait_counts.map {|k,v| [k,(v unless v < 1) || 1]}]
 
     skip = false
     lock_list[:rev] = 0
@@ -32,12 +36,12 @@ def acquire_lockr(node)
         rescue Excon::Errors::Conflict => e #409
         end
         sleep 10 if lock_list[:rev] > 0 #so we don't sleep the first time through.
-        got = PersistWrapper._get(PersistWrapper.deployment, [node[:persist][:traits], :rev].flatten)
+        got = PersistWrapper._get(PersistWrapper.deployment, [lockable_traits, :rev].flatten)
         rev = got.delete(:rev)
         expects = {:expect => {:rev => rev}, :replace => [:rev]}
         lock_list[:rev] = rev.to_i + 1
 
-        sanity_test = [node[:persist][:traits]].flatten.map {|trait| [got[trait]].flatten.include? node[:persist][:fqdn]}
+        sanity_test = [lockable_traits].flatten.map {|trait| [got[trait]].flatten.include? node[:persist][:fqdn]}
         if not (sanity_test.include? true) ^ (sanity_test.include? false)
             raise LockrError, "we've acquired the lock for some of our traits, but not all of them. this shouldn't be possible! lock looks like: #{got.inspect}"
         elsif sanity_test.include? true
@@ -55,11 +59,7 @@ def acquire_lockr(node)
 end
 
 def release_lockr(node)
-    if node[:persist][:traits].kind_of? Array
-        lock_list = Hash[node[:persist][:traits].map {|trait| [trait, node[:persist][:fqdn]]}]
-    else
-        lock_list = {node[:persist][:traits] => node[:persist][:fqdn]}
-    end
+    lockable_traits, lock_list = _get_lock_list(node)
 
     Chef::Log.info("Releasing the lock.")
     PersistWrapper._delete(PersistWrapper.deployment, lock_list)
