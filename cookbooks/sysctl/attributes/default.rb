@@ -1,3 +1,3 @@
 
-default.systcl.settings.kernel.shmmax = str_to_bytes(memory.total) / 4 / 1024 / 1024
+default.sysctl.settings.kernel.shmmax = str_to_bytes(memory.total) / 4 / 1024 / 1024
 
