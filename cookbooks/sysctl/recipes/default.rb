@@ -9,6 +9,6 @@ template "/etc/sysctl.d/60-chef-provided.conf" do
   action :create
   source "extra_sysctl.conf.erb"
   mode 0644
-  notifies :start, "service[procps", :immediately
+  notifies :start, "service[procps]", :immediately
 end
 
