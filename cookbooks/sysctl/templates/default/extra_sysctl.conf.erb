@@ -1,0 +1,5 @@
+
+<% flatten_hash(node.sysctl.settings.to_hash).sort {|a,b| a[0].to_s <=> b[0].to_s }.each do |k,v| %>
+<%=k%>=<%=v%>
+<% end %>
+
