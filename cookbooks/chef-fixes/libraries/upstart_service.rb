@@ -1,5 +1,9 @@
 
 class Chef::Provider::Service::Upstart
+  UPSTART_STATE_FORMAT = /\w+ ((?:\(\w+\) )?(?:\w+\/)?)(\w+)/
+    #no, that first capturing group is not necessary for the regex to work
+    #but the code that uses that regex expects there to be 2 capturing groups
+    #not that the data captured by the first capturing group is ever actually used
   alias _start_service start_service
   alias _stop_service stop_service
   alias _restart_service restart_service
