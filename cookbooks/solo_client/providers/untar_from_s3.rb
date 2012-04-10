@@ -1,9 +1,21 @@
 
 require 'fileutils'
 require 'md5'
-require 'fog'
+
+begin
+    require 'fog'
+    FOGFOUND = true unless defined? FOGFOUND
+rescue LoadError => e
+    Chef::Log.warn("Fog library not found. This is fine in development environments, but it is required in production.")
+    FOGFOUND = false unless defined? FOGFOUND
+end
+
 
 action :run do
+
+    if not FOGFOUND
+        raise RequirementError, "Aborting: The fog library is missing!"
+    end
 
     if new_resource.user.nil?
         user = node[:env][:user]
