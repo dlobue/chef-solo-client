@@ -1,6 +1,14 @@
 
 require 'fileutils'
-require 'fog'
+
+begin
+    require 'fog'
+    FOGFOUND = true unless defined? FOGFOUND
+rescue LoadError => e
+    Chef::Log.warn("Fog library not found. This is fine in development environments, but it is required in production.")
+    FOGFOUND = false unless defined? FOGFOUND
+end
+
 
 class Chef::Resource::File
     def checksum(arg=nil)
@@ -17,6 +25,9 @@ class Chef::Resource
 
     def initialize(name, run_context=nil)
       super
+      if not FOGFOUND
+        raise RequirementError, "Aborting: The fog library is missing!"
+      end
       @resource_name = :s3_file
       @provider = Chef::Provider::S3RemoteFile
       @bucket = nil
