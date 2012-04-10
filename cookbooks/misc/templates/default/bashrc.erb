@@ -76,7 +76,7 @@ dark_gray="\[\033[1;30m\]"
 none=$dark_gray
 
 
-PS1="${light_blue}\u${no_color}@${<%=node.ver_minor%>}\h<%="." + node.deployment if node.attribute?("deployment")%>${no_color} ${light_green}\w \$${no_color} "
+PS1="${light_blue}\u${no_color}@${<%=node.deployment_color || "none"%>}\h<%="." + node.deployment if node.attribute?("deployment")%>${no_color} ${light_green}\w \$${no_color} "
 export PS1
 
 export PATH=$PATH:/usr/local/bin:/opt/splunk/bin
