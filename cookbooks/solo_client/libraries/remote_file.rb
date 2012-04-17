@@ -169,8 +169,11 @@ class Chef::Provider
         else
           backup_new_resource
           begin
-              ::File.open(@new_resource.path, 'w') {|local_file|
-                  local_file.write(remote_file.body)}
+              ::File.open(@new_resource.path, 'w') do |local_file|
+                remote_file.collection.get(remote_file.identity) do |chunk, remaining, total|
+                  local_file.write(chunk)
+                end
+              end
           rescue => e
               ::File.delete( @new_resource.path )
               raise e
