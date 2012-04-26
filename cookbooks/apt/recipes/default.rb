@@ -12,7 +12,7 @@ execute "add apt key" do
   action :nothing
 end
 
-template "/etc/apt/sources.list.d/chef-given.list" do
+template (node.apt.sources_dir + "chef-given.list").to_s do
   owner "root"
   mode "0644"
   source "aptrepo.list.erb"
