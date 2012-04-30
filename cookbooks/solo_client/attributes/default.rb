@@ -5,6 +5,13 @@ default.fqdn = 'localhost'
 default.deployment = 'development'
 default.traits = []
 
+default.not_lockrable_traits = Promise.new do
+    attribute.to_hash.select { |k,v|
+          k.to_s.start_with?('not_lockrable_trait') and
+          k.to_s != 'not_lockrable_traits'
+    }.map { |k,v| v }.flatten
+end
+
 default.sdb_domain = "chef"
 
 default.env.archive_dir = "/var/cache/chef"

@@ -2,8 +2,8 @@
 name "cloud"
 description "recipes that should always be run in the cloud"
 
-override_attributes(
-  "not_lockrable_traits" => [ "cloud" ]
+default_attributes(
+  "not_lockrable_trait_cloud" => [ "cloud" ]
 )
 
 run_list(
