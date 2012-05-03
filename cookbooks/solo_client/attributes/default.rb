@@ -8,7 +8,7 @@ default.traits = []
 default.not_lockrable_traits = Promise.new do
     attribute.keys.select { |k|
           k.to_s != 'not_lockrable_traits' and k.to_s.start_with?('not_lockrable_trait')
-    }.map { |k| attribute[v] }.flatten
+    }.map { |k| attribute[k] }.flatten
 end
 
 default.sdb_domain = "chef"
