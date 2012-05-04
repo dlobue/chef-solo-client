@@ -3,7 +3,10 @@ class LockrError < RuntimeError
 end
 
 def _get_lockable_traits(node)
-    [node[:persist][:traits]].flatten - [node.attribute?("not_lockrable_traits") ? node[:not_lockrable_traits] : []].flatten
+    ([node[:persist][:traits]].flatten) - (node.keys.select { |k|
+          k.to_s != 'not_lockrable_traits' and k.to_s.start_with?('not_lockrable_trait')
+    }.map { |k| node[k] }.flatten)
+
 end
 
 def _get_lock_list(node)
