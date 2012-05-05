@@ -60,7 +60,7 @@ class Chef::Resource
       @key_format = /.+-[^-]+\.(t(ar\.)?)?(gz|bz2)/
 
       #these are for the untar action
-      @allowed_actions.push(:untar)
+      @allowed_actions.push(:untar, :download_and_untar)
       @delete_dir_in_container = nil
       @creates = nil
       @container_path = nil
@@ -224,6 +224,11 @@ end
 
 class Chef::Provider
   class S3Artifact < Chef::Provider::S3RemoteFile
+    def action_download_and_untar
+        action_create
+        action_untar
+    end
+
     def action_create
       prefix = [@new_resource.folder, @new_resource.artifact].select {|x| not (x.nil? or x.empty?)}.join('/')
 

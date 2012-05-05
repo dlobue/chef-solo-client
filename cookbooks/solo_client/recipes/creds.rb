@@ -3,8 +3,7 @@ cookbook_dir = Array(Chef::Config[:cookbook_path]).detect{|e| e =~ /\/cookbooks\
 
 s3_artifact "creds" do
   only_if { node.attribute?("get_creds") and node.get_creds }
-  action [:create, :untar]
-  user "root"
+  action :download_and_untar
   bucket node.env.s3_bucket
   folder node.env.s3_folder
   artifact name
