@@ -110,11 +110,14 @@ Chef::Client.when_run_starts do |run_status|
   use_lockr = Chef::Config[:use_lockr]
   if use_lockr
     run_status.node.run_list.insert(0, "recipe[solo_client::lockr_acquire]")
-    run_status.node.run_list << "recipe[solo_client::lockr_release]"
     run_status.client._expand_runlist unless run_status.client.nil?
   end
 end
 
+Chef::Client.when_run_completes_successfully do |run_status|
+  use_lockr = Chef::Config[:use_lockr]
+  release_lockr(run_status.node) if use_lockr
+end
 
 #monkey-patch the runner loop so that we can send it a SIGALRM and start the next loop early.
 class Chef::Application::Solo
