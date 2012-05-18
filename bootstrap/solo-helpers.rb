@@ -50,6 +50,26 @@ end
 
 
 
+class Chef::Node
+
+  # Consume data from ohai and Attributes provided as JSON on the command line.
+  def consume_external_attrs(ohai_data, json_cli_attrs)
+    Chef::Log.debug("Extracting run list from JSON attributes provided on command line")
+    consume_attributes(json_cli_attrs)
+
+    @automatic_attrs = Chef::Mixin::DeepMerge.merge(json_cli_attrs, ohai_data)
+
+    platform, version = Chef::Platform.find_platform_and_version(self)
+    Chef::Log.debug("Platform is #{platform} version #{version}")
+    @automatic_attrs[:platform] = platform
+    @automatic_attrs[:platform_version] = version
+  end
+
+end
+
+
+
+
 Chef::Client.before_starting_run do |json_attribs|
     git_branch = Chef::Config[:git_branch]
     git_repo = Chef::Config[:git_repo]
