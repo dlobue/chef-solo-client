@@ -29,7 +29,11 @@ def fakesearch(options = {})
     options[:deployment] = PersistWrapper.deployment unless options.has_key? :deployment
     options[:attributes] = nil unless options.has_key? :attributes
     attributes = options.delete(:attributes)
+    deployment = options.delete(:deployment)
     filters = []
+    if deployment
+        filters.push("deployment = '#{deployment}'")
+    end
     if not options.empty?
         options.each do |key,val|
             if val.kind_of? Array
