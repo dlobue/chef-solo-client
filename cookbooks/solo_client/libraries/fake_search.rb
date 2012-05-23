@@ -5,7 +5,7 @@ end
 
 def fakesearch_node(nodeType, options = {})
     results = fakesearch_nodes(nodeType, options)
-    if results.empty?
+    if results.nil? or results.empty?
         nil
     elsif results.size > 1
         raise "Multiple nodes found with node-type: #{nodeType}, #{results.inspect}"
