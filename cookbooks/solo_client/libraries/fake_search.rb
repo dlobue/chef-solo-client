@@ -15,7 +15,7 @@ def fakesearch_node(nodeType, options = {})
 end
 
 def fakesearch_nodes(nodeType, options = {})
-    unless nodeType.nil? or nodeType.kind_of? Array and nodeType.empty?
+    unless nodeType.nil? or (nodeType.kind_of? Array and nodeType.empty?)
         options[:traits] = nodeType
     end
     results = fakesearch(options)
