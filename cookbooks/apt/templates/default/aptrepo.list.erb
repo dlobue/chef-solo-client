@@ -1,3 +1,3 @@
 
-deb s3://<%="#{node.apt.aws_access_key_id}:[#{node.apt.aws_secret_access_key}]@" if node.apt.aws_secret_access_key %>s3.amazonaws.com/<%=node.apt.bucket%> <%=node.apt.distro%> <%=node.apt.components.join(' ')%>
+deb [arch=<%=[node.apt.arches].flatten.join(',')%>] s3://<%="#{node.apt.aws_access_key_id}:[#{node.apt.aws_secret_access_key}]@" if node.apt.aws_secret_access_key %>s3.amazonaws.com/<%=node.apt.bucket%> <%=node.apt.distro%> <%=node.apt.components.join(' ')%>
 
