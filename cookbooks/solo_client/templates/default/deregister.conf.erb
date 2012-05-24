@@ -2,5 +2,9 @@
 start on shutdown
 task
 
+pre-start script
+    stop chef || true
+end script
+
 exec /usr/local/bin/delete_sdb_record.py chef <%=@node.fqdn%>
 
