@@ -1,5 +1,5 @@
 
-cookbook_file "authorized_keys generator" do
+cookbook_file "deregister script" do
   only_if { node.current_user == 'root' }
   source "delete_sdb_record.py"
   path "/usr/local/bin/delete_sdb_record.py"
