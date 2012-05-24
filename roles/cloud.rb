@@ -11,6 +11,7 @@ run_list(
   "role[_begin]",
   "recipe[misc::mounts]",
   "recipe[solo_client::auto_restart_chef]",
+  "recipe[solo_client::delete_prep]",
   "role[make_homey]"
 )
 
