@@ -14,6 +14,7 @@ persist[:state] ||= 'pending'
 persist[:deployment] = deployment unless (persist[:deployment] == deployment)
 persist[:traits] = traits unless (persist[:traits] == traits)
 
+persist[:started] ||= Time.now.to_f.to_s
 persist[:fqdn] ||= fqdn
 
 persist[:ec2_public_hostname] ||= "localhost"
