@@ -23,19 +23,17 @@ def get_s3_pubkeys(pubkey_bucket, pubkey_prefix):
     except boto.exceptions.S3ResponseError:
         sys.stderr.write("Specified bucket doesn't exist.\n")
         sys.exit(10)
-    s3pubkeys = dict([(os.path.basename(pk.name), pk) for pk in bucket.get_all_keys(prefix=pubkey_prefix) if pk.name.endswith('.pub')])
-
-    if not s3pubkeys:
-        sys.stderr.write("No public keys found in the %s bucket with a prefix of %s.\n" % (pubkey_bucket, pubkey_prefix))
-        sys.exit(10)
-
-    return s3pubkeys
+    return dict([(os.path.basename(pk.name), pk) for pk in bucket.get_all_keys(prefix=pubkey_prefix) if pk.name.endswith('.pub')])
 
 def update_authorized_keys(pubkey_bucket, pubkey_prefix, user, include_deployment_keys=False, include_deployment_local_keys=False):
     s3pubkeys = get_s3_pubkeys(pubkey_bucket, pubkey_prefix)
 
     if include_deployment_local_keys:
         s3pubkeys.update( get_s3_pubkeys(pubkey_bucket, '%s/%s' % (include_deployment_local_keys, pubkey_prefix)) )
+
+    if not s3pubkeys:
+        sys.stderr.write("No public keys found in the %s bucket with a prefix of %s.\n" % (pubkey_bucket, pubkey_prefix))
+        sys.exit(10)
 
     localpubkeys = []
 
