@@ -16,7 +16,7 @@ def get_deployment_pubkeys():
         keyid = line.split('=')[0].strip()
         yield urllib2.urlopen(pubkeyurl + keyid + '/openssh-key').read().strip()
 
-def update_authorized_keys(pubkey_bucket, pubkey_prefix, user, include_deployment_keys=False):
+def get_s3_pubkeys(pubkey_bucket, pubkey_prefix):
     s3conn = boto.connect_s3()
     try:
         bucket = s3conn.get_bucket(pubkey_bucket)
@@ -28,6 +28,14 @@ def update_authorized_keys(pubkey_bucket, pubkey_prefix, user, include_deploymen
     if not s3pubkeys:
         sys.stderr.write("No public keys found in the %s bucket with a prefix of %s.\n" % (pubkey_bucket, pubkey_prefix))
         sys.exit(10)
+
+    return s3pubkeys
+
+def update_authorized_keys(pubkey_bucket, pubkey_prefix, user, include_deployment_keys=False, include_deployment_local_keys=False):
+    s3pubkeys = get_s3_pubkeys(pubkey_bucket, pubkey_prefix)
+
+    if include_deployment_local_keys:
+        s3pubkeys.update( get_s3_pubkeys(pubkey_bucket, '%s/%s' % (include_deployment_local_keys, pubkey_prefix)) )
 
     localpubkeys = []
 
@@ -78,7 +86,8 @@ if __name__ == '__main__':
     parser.add_argument('pubkey_prefix')
     parser.add_argument('user')
     parser.add_argument('-d', dest="include_deployment_keys", action='store_true')
+    parser.add_argument('-l', dest="include_deployment_local_keys", default=False)
     args = parser.parse_args()
 
-    update_authorized_keys(args.pubkey_bucket, args.pubkey_prefix, args.user, args.include_deployment_keys)
+    update_authorized_keys(args.pubkey_bucket, args.pubkey_prefix, args.user, args.include_deployment_keys, args.include_deployment_local_keys)
 
