@@ -5,6 +5,7 @@ description "recipes that should always run first."
 run_list(
     "recipe[apt::apt_fix]",
     "recipe[apt::default]",
+    "recipe[upstart::fix_logging]",
     "recipe[solo_client::default]",
     "recipe[solo_client::begin_end_hub]"
 )
