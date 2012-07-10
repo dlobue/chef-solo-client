@@ -1,5 +1,5 @@
 
-define :format_and_mount, :dev, :mountpoint do
+define :format_and_mount, :dev => nil, :mountpoint => nil do
     package "disktype"
 
     script "filesystem #{params[:dev]}" do
