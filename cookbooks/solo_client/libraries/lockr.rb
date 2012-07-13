@@ -19,8 +19,10 @@ def acquire_lockr(node)
     lockable_traits, lock_list = _get_lock_list(node)
     Chef::Log.debug("Just stating: lock_list is >#{lock_list.inspect}>")
 
+    ratio_divisor = Chef::Config[:lockr_ratio_divisor] ? Chef::Config[:lockr_ratio_divisor] : 10
+
     trait_max = Hash[lock_list.map { |trait,fqdn|
-        count = fakesearch(:traits => trait, :attributes => 'count(*)')/10
+        count = fakesearch(:traits => trait, :attributes => 'count(*)')/ratio_divisor
         [trait, (count >= 1 ? count : 1) ]}]
     Chef::Log.debug("Max number of locks that can be acquired for each trait: >#{trait_max.inspect}>")
 
