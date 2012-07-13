@@ -139,6 +139,12 @@ end
 
 #monkey-patch the runner loop so that we can send it a SIGALRM and start the next loop early.
 class Chef::Application::Solo
+
+  def configure_logging
+    Chef::Log.init(Chef::Config[:log_location])
+    Chef::Log.level = Chef::Config[:log_level]
+  end
+
   def run_application
     #TODO: add trap to catch SIGUSR1 and turn on debugging
     #TODO: do more cool stuff with signals and traps
