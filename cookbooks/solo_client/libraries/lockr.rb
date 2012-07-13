@@ -21,7 +21,7 @@ def acquire_lockr(node)
 
     trait_max = Hash[lock_list.map { |trait,fqdn|
         count = fakesearch(:traits => trait, :attributes => 'count(*)')/10
-        [trait,(count unless count < 1) || 1]}]
+        [trait, (count >= 1 ? count : 1) ]}]
     Chef::Log.debug("Max number of locks that can be acquired for each trait: >#{trait_max.inspect}>")
 
     skip = false
