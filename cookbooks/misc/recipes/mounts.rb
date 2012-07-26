@@ -1,6 +1,6 @@
 
 
-if node.attribute?('ec2') and node.attribute?("mounts") and not node.mounts.empty?
+if node.attribute?("mounts") and not node.mounts.empty?
     package "disktype"
     node.mounts.each do |dev,mountpoint|
         script "filesystem #{dev}" do
