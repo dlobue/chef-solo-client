@@ -1,0 +1,9 @@
+
+The entire purpose of this cookbook is to provide a 'notify_hub' resource.
+
+notify_hub resources are exactly what the name says it is - a hub for notifications. They are useful in a number of ways:
+-Provide a simple common name to subscribe to.
+-Chaining (resource A notifies the notify_hub, which causes all notifications associated with the hub to be triggered)
+-Make reuse of a series of events easier, reducing duplication of code.
+-Makes recipes simpler and easier to read.
+

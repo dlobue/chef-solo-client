@@ -1,3 +1,9 @@
+# I got tired of having to explicitly set the HOME env var when running a
+# command as a different user than the one that chef is running as. This will
+# automatically set it.
+# It also ALWAYS sets output_on_failure to true unless it is already set. There
+# is no reason why the default should be to be silent. It makes debugging
+# rare/random problems impossible.
 
 require 'etc'
 

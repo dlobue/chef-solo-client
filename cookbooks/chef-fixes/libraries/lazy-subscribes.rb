@@ -1,3 +1,13 @@
+# All this nonsense is necessary in order to get lazy subscriptions to work.
+# this is a lazy notification:
+# notifies :start, "service[mysql]"
+# specifically the "service[mysql]" identifier instead of passing a reference
+# to the resource directly. it is lazy in that chef resolves that identifier to
+# the resource only when the notification is run. This is useful as it does not
+# require a resource to be defined before the resource that will be notifying
+# it.
+# The problem is that subscribes doesn't support lazy resolving. it is supposed
+# to, but is broken or never fully implemented. This fixes that.
 
 class Chef::RunContext
   attr_accessor :subscription_queue

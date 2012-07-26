@@ -1,3 +1,6 @@
+# I got tired of having to explicitly set the HOME env var when running a
+# command as a different user than the one that chef is running as. This will
+# automatically set it.
 
 require 'etc'
 

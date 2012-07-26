@@ -1,0 +1,4 @@
+
+This cookbook contains libraries where I monkey-patch chef to fix bugs I
+discover, and don't wish (or am unable) to wait for fixes to be made upstream.
+
