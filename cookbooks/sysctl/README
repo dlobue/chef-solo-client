@@ -1,0 +1,14 @@
+
+This cookbook is for overriding sysctl parameters in case tuning is required.
+
+custom parameters are placed under the sysctl.settings namespace. The template will pick up everything under that namespace.
+Example:
+
+default.sysctl.settings.kernel.shmmax =  3926951936
+default.sysctl.settings.net.ipv4.conf.all.accept_source_route = 0
+default.sysctl.settings.net.ipv6.conf.all.accept_redirects = 0
+default.sysctl.settings.vm.mmap_min_addr = 65536
+
+
+The recipe will reload sysctl after the configuration file is updated.
+
