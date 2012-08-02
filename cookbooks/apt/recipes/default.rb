@@ -1,3 +1,5 @@
+# this recipe needs to be refactored. it adds an apt repository with custom
+# packages.
 
 include_recipe 'apt::recommends'
 
