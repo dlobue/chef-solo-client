@@ -7,3 +7,42 @@ notify_hub resources are exactly what the name says it is - a hub for notificati
 -Make reuse of a series of events easier, reducing duplication of code.
 -Makes recipes simpler and easier to read.
 
+notify_hub resources have no attributes outside of the standard meta-attributes
+(subscribes, notifies, action, not_if, only_if). Their only action is :notify
+(and :nothing, of course).
+
+
+A common use for the notify_hub resource is to delay starting services until
+the end of the chef run - when all configuration is complete. For example:
+
+    notify_hub "last_call" do
+        action :nothing
+    end
+
+    notify_hub "_go last" do
+        notifies :notify, "notify_hub[last_call]", :delayed
+    end
+
+    template "nginx.conf" do
+        notifies :stop, "service[nginx]", :immediately
+    end
+
+    service "nginx" do
+        action :nothing
+        subscribes :start, "notify_hub[last_call]"
+    end
+
+
+The benefit of this pattern is that should there be a problem with your typo in
+your configuration, instead of reloading the service - which would fail, and
+crash chef preventing other delayed notifications from being run (resulting in
+other services never getting a reload command at all since the chef crashed
+before they were given the reload command, and never getting it on subsequent
+runs because the configuration file has already been updated, so it won't be
+changed again and trigger the service reload)- the service is stopped and only
+started at the end of the run. Instead of having a service whose operation
+doesn't match its configuration file (difficult and time-consuming to debug;
+can go on for weeks before anybody notices), you have a service that just isn't
+running (much easier to detect, and can be corrected by chef on subsequent
+runs).
+
