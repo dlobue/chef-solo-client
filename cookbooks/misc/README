@@ -1,0 +1,20 @@
+
+The misc cookbook is for recipes that I can't think of a better place to put.
+
+At the time of writing, the misc cookbook contains the following recipes:
+
+base_pkgs
+    packages I expect to always be present on every server (vim, gawk, git, etc)
+
+bashrc
+    puts custom bashrc in place for users identified in the attribute node.misc.users
+
+dotssh_dir
+    creates the .ssh directory in the homedir for users identified in the attribute node.misc.users, and ensures it has the correct permissions.
+
+dotssh_files
+    creates the .ssh/authorized_keys file for users identified in the attribute node.misc.users, and ensures it has the correct permissions.
+
+mounts
+    formats block devices identified in node.mounts (a hash of block device => mount point) with ext3 (if they have no filesystem already. not yet tested with block devices formatted with filesystems other than ext3), and then mounts the filesystem as specified.
+
