@@ -1,0 +1,59 @@
+
+This cookbook for upstart is primary for the custom upstart_event resource.
+
+
+UpstartEvent
+============
+
+The upstart_event resource is to make emitting events to upstart from chef cleaner, easier to modify, and just look nicer. upstart_event is based on the execute resource, and as such it shares all of execute's actions and attributes. The only attributes really needed however are those listed below:
+
+Actions
+-------
+
+- :run
+- :nothing
+
+Attributes
+----------
+
+wait
+    Whether to block until job started by event completes, or to run it in the
+    background.
+
+    default value
+        true
+
+event
+    the event to emit
+
+    default value
+        name
+
+variables
+    this is a hash of key:value pairs to send with the event
+
+
+
+
+Example
+-------
+
+The following resource::
+
+    upstart_event "start-dbload" do
+      action :nothing
+      wait false
+      variables(
+        :dbname => "mydb",
+        :sdb_domain => "chef",
+        :sdb_key => "localhost",
+        :clean_dump => "/mnt/cleandb.sql.gz",
+        :config_script => "/mnt/config_db.sql"
+      )
+    end
+
+
+Would result in the following command being executed::
+
+    /sbin/initctl emit --no-wait start-dbload dbname=mydb sdb_domain=chef sdb_key=localhost clean_dump=/mnt/cleandb.sql.gz config_script=/mnt/config_db.sql
+
