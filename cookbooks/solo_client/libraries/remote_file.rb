@@ -1,5 +1,6 @@
 
 require 'fileutils'
+require 'pathname'
 
 begin
     require 'fog'
