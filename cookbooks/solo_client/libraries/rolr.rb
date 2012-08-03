@@ -1,3 +1,6 @@
+# Rolr was the precursor to Lockr. It is essentially a queue. It is kept around
+# for historical reasons, and because it may one day be useful again since it
+# is not susceptible to lock starvation.
 
 class RolrError < RuntimeError
 end
@@ -28,10 +31,6 @@ class Rolr
             end
         end
 
-#        @node[:persist].update(:state => 'dirty',
-#                            :activity => activity,
-#                            :dirty_stamp => "#{"%.5f" % Time.now.to_f}___#{@node[:fqdn]}"
-#        )
         @node[:persist][:state] = 'dirty'
         @node[:persist][:activity] = activity
         @node[:persist][:dirty_stamp] = Time.now.to_f

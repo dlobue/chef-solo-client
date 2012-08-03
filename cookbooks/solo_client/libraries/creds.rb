@@ -1,3 +1,4 @@
+# this library is an attempt to support any credential file format I may come across.
 
 def get_creds
     begin
@@ -22,10 +23,6 @@ def _get_telegraph_creds
             }.map { |k,v| [keymap[k], v] }
         }
     ]
-    #f = File.open(fname)
-    #creds = Hash[f.map { |line| line.split("=").map { |str| str.strip() } }]
-    #f.close()
-    #return creds
 end
 
 def _get_boto_creds

@@ -1,0 +1,15 @@
+
+This is the very core of all cookbooks. This cookbook contains a number of tools which replace functionality otherwise only found when using chef-client with chef-server.
+
+This cookbook's primary purpose is to provide:
+-Persisting of attributes to a database backend (currently only AWS SimpleDB is supported)
+-Searching said database backend for servers running dependency services (ie- so that addresses of memcached or db servers don't have to be hard-coded).
+-Global semaphore (or lock) (so that your site doesn't go down when all your servers start upgrading nginx to the latest version at the same time).
+-Resources for downloading files and artifacts from AWS S3
+
+As a bonus it provides lots of other things as well (probably too much actually, probably should be refactored):
+-Keeping the authorized_keys file in sync with a secure centralized source (S3) to make granting and revoking access simple.
+-Deregistration from central database on shutdown.
+-Acquisition of credentials from a secure store (S3).
+
+

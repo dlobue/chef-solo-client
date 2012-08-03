@@ -1,3 +1,7 @@
+# lockr is a global semaphore. it takes advantage of the SimpleDB consistency enhancements released in 2010: http://aws.amazon.com/articles/3572  
+# The part of the consistency enhancements that lockr uses is not far different from an SQL UPDATE statement. Before that, some background information:
+# Each deployment gets its own item (like a record, or a document) in simpledb which is used for storing the state of the semaphore. In the semaphore document there is (among other things), a revision counter. Every time chef grabs the semaphore, it increases the revision counter.
+# As I was saying, the way the semaphore works is by telling simpledb to update the record only if the revision counter is the same number it was the last time we looked. If the revision counter hasn't changed since the last time we looked, then grab the semaphore and increase the revision counter by one. Changing the revision counter causes the "UPDATE" command performed by other servers at the same time to fail.
 
 class LockrError < RuntimeError
 end
