@@ -18,7 +18,10 @@ class Chef::Provider::Git
     return revmatch unless revmatch
     # check that the revision matches the checked out HEAD. guards against
     # manually edited files and ensures submodules are on the correct revision.
-    command = "git diff --no-ext-diff --quiet --exit-code HEAD"
+    # the --ignore-submodules=untracked option makes git diff ignore untracked
+    # files in submodule, so they won't cause chef to freak out if a random log
+    # file sits around.
+    command = "git diff --no-ext-diff --quiet --exit-code --ignore-submodules=untracked HEAD"
     shell_out!(command, :cwd => @new_resource.destination, :returns => [0,1]).exitstatus == 0
   end
 
