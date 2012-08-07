@@ -3,14 +3,11 @@
 # this is necessary when chef is running as a daemon in production to get
 # around the fact that chef does not reload library files.
 
-cookbooks_path = Array(Chef::Config[:cookbook_path]).detect{|e| e =~ /\/cookbooks\/*$/ }
-git_hooks_path = File.expand_path(File.join(cookbooks_path, '..', '.git', 'hooks'))
-
-template "#{git_hooks_path}/post-merge" do
-    only_if { File.exists?(git_hooks_path) }
-    source "chef-repo_git-hook_post-merge"
-    owner "root"
-    group "root"
-    mode 0755
+find_cookbook_hookdirs.each do |hookdir|
+    template (hookdir + "post-merge").to_s do
+        only_if { hookdir.directory? }
+        source "chef-repo_git-hook_post-merge"
+        mode 0755
+    end
 end
 
