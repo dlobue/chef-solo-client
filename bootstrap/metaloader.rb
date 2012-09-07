@@ -15,7 +15,7 @@ libdirs = PRELOAD_COOKBOOKS.map do |cbname|
 end.flatten
 
 def filter_libs(libdir)
-  libdir = Pathname.new unless libdir.kind_of? Pathname
+  libdir = Pathname.new libdir unless libdir.kind_of? Pathname
   libdir.entries.select { |entry|
     entry.file? and entry.extname == '.rb'
   }.map do |entry|
@@ -24,12 +24,12 @@ def filter_libs(libdir)
 end
 
 # load all the chef-fixes libraries
-libdirs.map { |libdir| filter_libs libdir }.each do |lib|
+libdirs.map { |libdir| filter_libs libdir }.flatten..each do |lib|
   require lib.to_s
 end
 
 # load all the bootstrap helpers
-filter_libs(File.dirname(__FILE__)).each do |lib|
+filter_libs(File.dirname(__FILE__)).flatten.each do |lib|
   lib = lib.to_s
   require lib unless lib == __FILE__
 end
