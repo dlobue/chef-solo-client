@@ -16,10 +16,10 @@ end.flatten
 
 def filter_libs(libdir)
   libdir = Pathname.new libdir unless libdir.kind_of? Pathname
-  libdir.entries.select { |entry|
-    entry.file? and entry.extname == '.rb'
-  }.map do |entry|
+  libdir.entries.map { |entry|
     libdir + entry
+  }.select do |entry|
+    entry.file? and entry.extname == '.rb'
   end
 end
 
