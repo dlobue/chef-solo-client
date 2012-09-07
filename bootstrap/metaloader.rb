@@ -24,7 +24,7 @@ def filter_libs(libdir)
 end
 
 # load all the chef-fixes libraries
-libdirs.map { |libdir| filter_libs libdir }.flatten..each do |lib|
+libdirs.map { |libdir| filter_libs libdir }.flatten.each do |lib|
   require lib.to_s
 end
 
