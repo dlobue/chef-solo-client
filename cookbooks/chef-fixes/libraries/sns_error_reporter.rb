@@ -24,10 +24,10 @@ class Chef::Handler
         message << "\n"
       end
       message << "Run start time: "
-      message << start_time
+      message << start_time.to_s
       message << "\n"
       message << "Run end time: "
-      message << end_time
+      message << end_time.to_s
       message << "\n"
       message << "Exception: "
       message << run_status.formatted_exception
