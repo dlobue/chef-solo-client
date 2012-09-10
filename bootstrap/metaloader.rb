@@ -34,7 +34,6 @@ SKIP_LIBS.push THIS_LIB.realpath if THIS_LIB.symlink?
 
 # load all the bootstrap helpers
 filter_libs(File.dirname(__FILE__)).flatten.each do |lib|
-  lib = lib.to_s
   require lib.to_s unless SKIP_LIBS.include? lib
 end
 
