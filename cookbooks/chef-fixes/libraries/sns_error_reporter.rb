@@ -11,6 +11,9 @@ class Chef::Handler
     end
     def report
       raise "SNS Topic ARN configuration missing!" unless Chef::Config[:sns_report_topic_arn]
+      return unless failed? #in case the exception handler is run whenever
+                            #an exception is raised, even though the run
+                            #completed successfully
 
       message = "Chef run failed on: "
       message << node.fqdn
