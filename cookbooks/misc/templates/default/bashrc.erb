@@ -85,6 +85,13 @@ alias grpe=grep
 alias pgrpe=pgrep
 alias screen='TERM=screen screen'
 
+
+function curl_and_newline {
+    \curl "$@"
+    echo
+}
+alias curl=curl_and_newline
+
 export BUCKET=<%=node.env.s3_bucket%>
 export FOLDER=<%=node.env.s3_folder%>
 
