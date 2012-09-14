@@ -52,7 +52,7 @@ class Chef::Application::Solo
 
         @chef_solo = Chef::Client.new(@chef_solo_json)
         @chef_solo.starts_next
-        Timeout::timeout( Chef::Config[:run_timeout] or DEFAULT_RUN_TIMEOUT ) do
+        Timeout::timeout(( Chef::Config[:run_timeout] or DEFAULT_RUN_TIMEOUT )) do
           # a chef run that takes more than 12 hours is inconceivable.
           # if a run takes longer, crash so that chef stands a chance of recovering on its own.
           # if more time is needed for whatever reason, the default run timeout can be overridden
