@@ -16,6 +16,7 @@ end
 persist[:state] ||= 'pending'
 persist[:deployment] = deployment unless (persist[:deployment] == deployment)
 persist[:traits] = traits unless (persist[:traits] == traits)
+persist[:roles] = roles unless (persist[:roles] == roles)
 
 persist[:started] ||= Time.now.to_f.to_s
 persist[:fqdn] ||= fqdn
