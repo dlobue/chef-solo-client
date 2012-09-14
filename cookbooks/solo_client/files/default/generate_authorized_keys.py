@@ -6,6 +6,7 @@ import os
 import sys
 import urllib2
 import boto
+from tempfile import mkstemp
 
 def get_deployment_pubkeys():
     pubkeyurl = 'http://instance-data/latest/meta-data/public-keys/'
@@ -64,14 +65,35 @@ def update_authorized_keys(pubkey_bucket, pubkey_prefix, user, include_deploymen
             else:
                 os.remove(filePath)
 
-    with open(authorized_keys, 'w') as f:
-        if include_deployment_keys:
-            for pubkey in get_deployment_pubkeys():
-                f.write(pubkey + '\n')
 
-        for pubkey in localpubkeys:
-            with open(pubkey) as pk:
-                f.write(pk.read().strip() + '\n')
+    temp_fd,temp_file = mkstemp(dir=dot_ssh)
+    try:
+        with os.fdopen(temp_fd, 'w') as f:
+            if include_deployment_keys:
+                for pubkey in get_deployment_pubkeys():
+                    f.write(pubkey + '\n')
+
+            for pubkey in localpubkeys:
+                with open(pubkey) as pk:
+                    f.write(pk.read().strip() + '\n')
+
+        temp_file_size = os.path.getsize(temp_file)
+        combined_size = sum(os.path.getsize(pk) for pk in localpubkeys)
+        if temp_file_size and temp_file_size >= combined_size:
+            if os.path.isfile(authorized_keys):
+                orig_stats = os.stat(authorized_keys)
+                os.chmod(temp_file, orig_stats.st_mode)
+                os.chown(temp_file, orig_stats.st_uid, orig_stats.st_gid)
+            os.rename(temp_file, authorized_keys)
+    finally:
+        if os.path.exists(temp_file):
+            try:
+                #not sure whether the fd is open or not. close it anyway
+                #if it succeeds, yay. if it fails, whatever.
+                os.close(temp_fd)
+            except OSError:
+                pass
+            os.remove(temp_file)
 
 
 def md5sum(filePath):
