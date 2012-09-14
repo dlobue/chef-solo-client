@@ -1,4 +1,8 @@
 
+require 'timeout'
+
+DEFAULT_RUN_TIMEOUT = 60 * 60 * 12
+
 #add a hook entry point that is executed before the chef run begins
 #the primary purpose of this is to checkout the latest version of the cookbooks
 #from git.
@@ -48,7 +52,12 @@ class Chef::Application::Solo
 
         @chef_solo = Chef::Client.new(@chef_solo_json)
         @chef_solo.starts_next
-        @chef_solo.run
+        Timeout::timeout( Chef::Config[:run_timeout] or DEFAULT_RUN_TIMEOUT ) do
+          # a chef run that takes more than 12 hours is inconceivable.
+          # if a run takes longer, crash so that chef stands a chance of recovering on its own.
+          # if more time is needed for whatever reason, the default run timeout can be overridden
+          @chef_solo.run
+        end
         @chef_solo = nil
         e = nil
         if Chef::Config[:interval]
