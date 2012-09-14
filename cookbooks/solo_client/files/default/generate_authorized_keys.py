@@ -57,7 +57,12 @@ def update_authorized_keys(pubkey_bucket, pubkey_prefix, user, include_deploymen
     for filename,pkey in s3pubkeys.iteritems():
         filePath = os.path.join(dot_ssh, filename)
         pkey.get_contents_to_filename(filePath)
-        localpubkeys.append(filePath)
+        if os.path.isfile(filePath):
+            if (os.path.getsize(filePath) == pkey.size and
+                pkey.etag.strip('"') == md5sum(filePath)):
+                localpubkeys.append(filePath)
+            else:
+                os.remove(filePath)
 
     with open(authorized_keys, 'w') as f:
         if include_deployment_keys:
