@@ -22,7 +22,7 @@ class Chef::Resource::File
 end
 
 class Chef::Resource
-  class S3RemoteFile < Chef::Resource::RemoteFile
+  class S3File < Chef::Resource::RemoteFile
 
     def initialize(name, run_context=nil)
       super
@@ -30,8 +30,13 @@ class Chef::Resource
         raise RequirementError, "Aborting: The fog library is missing!"
       end
       @resource_name = :s3_file
-      @provider = Chef::Provider::S3RemoteFile
+      @provider = Chef::Provider::S3File
+      @allowed_actions.push(:create_artifact)
       @bucket = nil
+      @folder = nil
+      @artifact = name
+      #@artifact = File.basename(name, File.extname(name)) #turns /a/b/artifact_name.war into artifact_name
+      @key_format = /.+-[^-]+\.(t(ar\.)?)?(gz|bz2)/
     end
 
     def bucket(arg=nil)
@@ -42,29 +47,12 @@ class Chef::Resource
       )
     end
 
-    def provider(arg=nil)
-      Chef::Resource.instance_method(:provider).bind(self).call(arg)
-    end
-
-  end
-end
-
-class Chef::Resource
-  class S3Artifact < Chef::Resource::S3RemoteFile
-
-    def initialize(name, run_context=nil)
-      super
-      @resource_name = :s3_artifact
-      @provider = Chef::Provider::S3Artifact
-      @artifact = nil
-      @folder = nil
-      @key_format = /.+-[^-]+\.(t(ar\.)?)?(gz|bz2)/
-
-      #these are for the untar action
-      @allowed_actions.push(:untar, :download_and_untar)
-      @delete_dir_in_container = nil
-      @creates = nil
-      @container_path = nil
+    def folder(arg=nil)
+      set_or_return(
+        :folder,
+        arg,
+        :kind_of => [ String, NilClass ]
+      )
     end
 
     def key_format(arg=nil)
@@ -83,36 +71,8 @@ class Chef::Resource
       )
     end
 
-    def folder(arg=nil)
-      set_or_return(
-        :folder,
-        arg,
-        :kind_of => [ String, NilClass ]
-      )
-    end
-
-    def container_path(arg=nil)
-      set_or_return(
-        :container_path,
-        arg,
-        :kind_of => [ String, Pathname ]
-      )
-    end
-
-    def creates(arg=nil)
-      set_or_return(
-        :creates,
-        arg,
-        :kind_of => [ String, Pathname ]
-      )
-    end
-
-    def delete_dir_in_container(arg=nil)
-      set_or_return(
-        :delete_dir_in_container,
-        arg,
-        :kind_of => [ String, NilClass ]
-      )
+    def provider(arg=nil)
+      Chef::Resource.instance_method(:provider).bind(self).call(arg)
     end
 
   end
@@ -135,7 +95,7 @@ end
 
 
 class Chef::Provider
-  class S3RemoteFile < Chef::Provider::RemoteFile
+  class S3File < Chef::Provider::RemoteFile
 
     def checksum(file)
       Chef::ChecksumCache.generate_md5_checksum_for_file(file)
@@ -143,6 +103,28 @@ class Chef::Provider
 
     def action_create
       bucket = get_bucket
+      _action_create(bucket)
+    end
+
+    def action_create_artifact
+      prefix = [@new_resource.folder, @new_resource.artifact].select { |x|
+        not (x.nil? or x.empty?)
+      }.join('/')
+
+      bucket = get_bucket
+      # First, see if there is a new archive to download.
+      artifacts = bucket.files.all(
+          :prefix => prefix
+      ).to_a.select{ |k|
+          not k.key.split('/')[-1].match(@new_resource.key_format).nil?
+      }.sort { |a,b| b.key <=> a.key }
+
+      raise "no artifacts found!" if artifacts.empty?
+
+      Chef::Log.info("Newest artifact found is #{artifacts[0].key}")
+
+      @new_resource.source(artifacts[0].key)
+
       _action_create(bucket)
     end
 
@@ -159,9 +141,6 @@ class Chef::Provider
       if current_resource_matches_target_checksum?
         Chef::Log.debug("#{@new_resource} checksum matches target checksum (#{@new_resource.checksum}) - not updating")
       else
-
-        #storage = Fog::Storage.new(get_creds().merge(:provider => 'AWS'))
-        #bucket = storage.directories.get(@new_resource.bucket)
 
         remote_file = bucket.files.head(@new_resource.source)
 
@@ -223,74 +202,6 @@ class Chef::Provider
   end
 end
 
-class Chef::Provider
-  class S3Artifact < Chef::Provider::S3RemoteFile
-    def action_download_and_untar
-        action_create
-        action_untar
-    end
 
-    def action_create
-      prefix = [@new_resource.folder, @new_resource.artifact].select {|x| not (x.nil? or x.empty?)}.join('/')
-
-      bucket = get_bucket
-      # First, see if there is a new archive to download.
-      artifacts = bucket.files.all(
-          :prefix => prefix
-      ).to_a.select{ |k|
-          not k.key.split('/')[-1].match(@new_resource.key_format).nil?
-      }.sort { |a,b| b.key <=> a.key }
-
-      raise "no artifacts found!" if artifacts.empty?
-
-      Chef::Log.info("Newest artifact found is #{artifacts[0].key}")
-
-      @new_resource.source(artifacts[0].key)
-
-      _action_create(bucket)
-    end
-
-    def action_untar
-
-      raise "artifact archive missing!" unless ::File.exist? @new_resource.path
-
-      createsPath = new_resource.creates.to_s.start_with?('/') ? new_resource.creates.to_s : ::File.join(new_resource.container_path, new_resource.creates)
-
-      #extract block
-      if not ::File.exists?(createsPath) or ::File.mtime(@new_resource.path) > ::File.mtime(createsPath)
-          #delete block
-          if not new_resource.delete_dir_in_container.nil?
-              Chef::Log.info("deleting dir_in_container: #{new_resource.container_path}/#{new_resource.delete_dir_in_container}")
-              FileUtils.remove_dir( "#{new_resource.container_path}/#{new_resource.delete_dir_in_container}", true )
-          end
-          Chef::Log.info("untaring archive #{@new_resource.path} to #{new_resource.container_path}")
-
-          decompressvar = case
-                          when @new_resource.path.end_with?('bz2') then 'j'
-                          when @new_resource.path.end_with?('gz') then 'z'
-                          else ''
-                          end
-
-          args = {:command => "tar #{decompressvar}xf #{@new_resource.path} -C #{new_resource.container_path}"}
-          args[:user] = @new_resource.owner if @new_resource.owner
-          args[:group] = @new_resource.group if @new_resource.group
-
-          begin
-              Chef::Mixin::Command.run_command(args)
-          rescue Chef::Exceptions::Exec => e
-              ::File.rename( @new_resource.path, "#{@new_resource.path}.failed" )
-              raise e
-          end
-          FileUtils.touch createsPath
-          new_resource.updated_by_last_action(true)
-      else
-          new_resource.updated_by_last_action(false)
-      end
-    end
-  end
-end
-
-
-Chef::Platform.platforms[:default].merge! :s3_file => Chef::Provider::S3RemoteFile
-Chef::Platform.platforms[:default].merge! :s3_artifact => Chef::Provider::S3Artifact
+Chef::Platform.platforms[:default].merge! :s3_file => Chef::Provider::S3File
 
