@@ -8,7 +8,7 @@ default_attributes(
 
 run_list(
   "recipe[solo_client::creds]",
-  "role[_begin]",
+  "role[begin]",
   "recipe[misc::mounts]",
   "recipe[solo_client::auto_restart_chef]",
   "recipe[solo_client::delete_prep]",
