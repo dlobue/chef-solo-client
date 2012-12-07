@@ -1,8 +1,4 @@
-# this recipe needs to be refactored. it adds an apt repository with custom
-# packages.
-
-include_recipe 'apt::recommends'
-
+# refactor to use 3rd party apt cookbook?
 execute "apt-get update" do
   action :nothing
   retries 3
