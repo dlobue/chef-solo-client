@@ -1,17 +1,19 @@
 
 cookbook_dir = Array(Chef::Config[:cookbook_path]).detect{|e| e =~ /\/cookbooks\/*$/ }
 
-s3_artifact "creds" do
+s3_file "creds" do
   only_if { node.attribute?("get_creds") and node.get_creds }
-  action :download_and_untar
+  action :create_artifact
   bucket node.env.s3_bucket
   folder node.env.s3_folder
-  artifact name
   path node.env.archive_dir + "#{name}.tgz"
+end
 
+untar_archive "creds" do
+  only_if { node.attribute?("get_creds") and node.get_creds }
+  path node.env.archive_dir + "#{name}.tgz"
   container_path cookbook_dir
   creates File.join(cookbook_dir, 'cred_cookbook')
-
   notifies :create, "ruby_block[apply_creds]", :immediately
 end
 
