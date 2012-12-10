@@ -68,7 +68,7 @@ class Chef::Provider
                         end
 
         #TODO: support --no-same-permissions and custom umask
-        args = {:command => "tar --no-same-owner --touch #{decompressvar}xf #{@new_resource.path} -C #{new_resource.container_path}"}
+        args = {:command => "tar #{decompressvar}xf #{@new_resource.path} --no-same-owner --touch -C #{new_resource.container_path}"}
         args[:user] = @new_resource.owner if @new_resource.owner
         args[:group] = @new_resource.group if @new_resource.group
 
