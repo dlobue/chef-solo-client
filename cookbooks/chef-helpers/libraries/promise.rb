@@ -15,6 +15,7 @@ class Promise < Proc
     undef_method :is_a?
     undef_method :kind_of?
     undef_method :respond_to?
+    undef_method :nil?
     undef_method :class
     undef_method :to_s
     undef_method :display
