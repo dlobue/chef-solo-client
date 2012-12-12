@@ -6,12 +6,12 @@ s3_file "creds" do
   action :create_artifact
   bucket node.env.s3_bucket
   folder node.env.s3_folder
-  path node.env.archive_dir + "#{name}.tgz"
+  path (node.env.archive_dir + "#{name}.tgz").to_s
 end
 
 untar_archive "creds" do
   only_if { node.attribute?("get_creds") and node.get_creds }
-  path node.env.archive_dir + "#{name}.tgz"
+  path (node.env.archive_dir + "#{name}.tgz").to_s
   container_path cookbook_dir
   creates File.join(cookbook_dir, 'cred_cookbook')
   notifies :create, "ruby_block[apply_creds]", :immediately
