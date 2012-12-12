@@ -1,4 +1,6 @@
 
+include_recipe "solo_client::default"
+
 cookbook_dir = Array(Chef::Config[:cookbook_path]).detect{|e| e =~ /\/cookbooks\/*$/ }
 
 s3_file "creds" do
