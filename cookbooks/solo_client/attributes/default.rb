@@ -9,7 +9,8 @@ default.traits = []
 
 default.sdb_domain = "chef"
 
-default.env.root_dir = Pathname.new '/mnt'
+default.root_dir = '/mnt'
+default.env.root_dir = Promise.new { Pathname.new root_dir }
 default.env.archive_dir = Promise.new { env.root_dir + 'archives' }
 
 default.delete_me_attribs = '/root/delete_me.rb'
