@@ -1,6 +1,7 @@
 
 require 'fileutils'
 require 'pathname'
+require 'moneta/basic_file'
 
 begin
     require 'fog'
@@ -84,6 +85,24 @@ class Chef::Resource
       Chef::Resource.instance_method(:provider).bind(self).call(arg)
     end
 
+  end
+end
+
+# release version of moneta has bug that doesn't return data value
+class Moneta::BasicFile
+  def [](key)
+    if ::File.exist?(path(key))
+      data = raw_get(key)
+      if @expires
+        if data[:expires_at].nil? || data[:expires_at] > Time.now
+          data[:value]
+        else
+          delete!(key)
+        end
+      else
+        data
+      end
+    end
   end
 end
 
