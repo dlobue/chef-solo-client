@@ -32,11 +32,20 @@ class Chef::Resource
       @resource_name = :s3_file
       @provider = Chef::Provider::S3File
       @allowed_actions.push(:create_artifact)
+      @download_threads = 10
       @bucket = nil
       @folder = nil
       @artifact = name
       #@artifact = File.basename(name, File.extname(name)) #turns /a/b/artifact_name.war into artifact_name
       @key_format = /.+-[^-]+\.(t(ar\.)?)?(gz|bz2)/
+    end
+
+    def download_threads(arg=nil)
+      set_or_return(
+        :download_threads,
+        arg,
+        :kind_of => [ Fixnum, FalseClass ]
+      )
     end
 
     def bucket(arg=nil)
@@ -149,11 +158,35 @@ class Chef::Provider
         else
           backup_new_resource
           begin
+            if (remote_file / 1024 / 1024) <= 100 or @new_resource.download_threads == false
               ::File.open(@new_resource.path, 'w') do |local_file|
                 remote_file.collection.get(remote_file.identity) do |chunk, remaining, total|
                   local_file.write(chunk)
                 end
               end
+            else
+              FileUtils.touch @new_resource.path
+              threads = []
+              num_parts = @new_resource.download_threads
+              size = remote_file.content_length
+              part_size = (size.to_f / num_parts.to_f).ceil
+              num_parts.times do |i|
+                bytes_begin = part_size * i
+                bytes_end = [bytes_begin + part_size - 1, size - 1].min
+                threads << Thread.new do
+
+                  ::File.open(@new_resource.path, 'r+') do |local_file|
+                    local_file.pos = bytes_begin
+                    remote_file.collection.get(remote_file.identity,
+                                               "Range" => "bytes=%d-%d" % [bytes_begin, bytes_end]) do |chunk, remaining, total|
+                      local_file.write(chunk)
+                    end
+                  end
+
+                end
+              end
+              threads.each { |t| t.join }
+            end
           rescue => e
               ::File.delete( @new_resource.path )
               raise e
