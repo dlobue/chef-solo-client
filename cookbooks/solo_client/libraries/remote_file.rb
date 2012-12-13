@@ -188,7 +188,7 @@ class Chef::Provider
               threads.each { |t| t.join }
             end
           rescue => e
-              ::File.delete( @new_resource.path )
+              ::File.delete( @new_resource.path ) if ::File.exists?( @new_resource.path )
               raise e
           end
           FileUtils.touch @new_resource.path
