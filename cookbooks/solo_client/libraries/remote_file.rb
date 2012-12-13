@@ -158,7 +158,7 @@ class Chef::Provider
         else
           backup_new_resource
           begin
-            if (remote_file / 1024 / 1024) <= 100 or @new_resource.download_threads == false
+            if (remote_file.content_length / 1024 / 1024) <= 100 or @new_resource.download_threads == false
               ::File.open(@new_resource.path, 'w') do |local_file|
                 remote_file.collection.get(remote_file.identity) do |chunk, remaining, total|
                   local_file.write(chunk)
