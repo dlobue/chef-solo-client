@@ -186,6 +186,30 @@ class Chef::Provider
                 end
               end
             else
+              def downloader(bytes_begin, bytes_end, remote_file)
+                curthread = Thread.current
+                curthread[:bytes_begin] = bytes_begin
+                curthread[:bytes_end] = bytes_end
+
+                ::File.open(@new_resource.path, 'r+') do |local_file|
+                  local_file.pos = bytes_begin
+                  begin
+                    remote_file.collection.get(remote_file.identity,
+                                               "Range" => "bytes=%d-%d" % [bytes_begin, bytes_end]
+                                              ) do |chunk, remaining, total|
+                      local_file.write(chunk)
+                    end
+                  rescue => e
+                    curthread[:final_pos] = local_file.pos
+                    raise e
+                  end
+                  curthread[:final_pos] = local_file.pos
+                end
+              end
+              def spinner(threads)
+                #so we don't have to wait until every thread finishes to find out an exception occurred
+                sleep(5) until threads.map { |t| t.join(0.1) }.select { |t| t.nil? }.empty?
+              end
               FileUtils.touch @new_resource.path
               threads = []
               num_parts = @new_resource.download_threads
@@ -199,28 +223,10 @@ class Chef::Provider
                 Chef::Log.info "Beginning downloading of part %s. Bytes beginning at %s and ending at %s" % [i, bytes_begin, bytes_end]
                 #TODO: change log level from info to debug when sure it works right
                 threads << Thread.new(bytes_begin, bytes_end) do |bytes_begin, bytes_end|
-                  curthread = Thread.current
-                  curthread[:bytes_begin] = bytes_begin
-                  curthread[:bytes_end] = bytes_end
-
-                  ::File.open(@new_resource.path, 'r+') do |local_file|
-                    local_file.pos = bytes_begin
-                    begin
-                      remote_file.collection.get(remote_file.identity,
-                                                 "Range" => "bytes=%d-%d" % [bytes_begin, bytes_end]
-                                                ) do |chunk, remaining, total|
-                        local_file.write(chunk)
-                      end
-                    rescue => e
-                      curthread[:final_pos] = local_file.pos
-                      raise e
-                    end
-                    curthread[:final_pos] = local_file.pos
-                  end
-
+                  downloader(bytes_begin, bytes_end, remote_file)
                 end
               end
-              sleep(5) until threads.map { |t| t.join(0.1) }.select { |t| t.nil? }.empty? #so we don't have to wait until every thread finishes to find out an exception occurred
+              spinner(threads)
               raise DownloadError, "Some download threads are still alive!!" unless threads.select { |t| t.alive? }.empty?
               raise DownloadError, "Some download threads didn't finish downloading!" unless threads.reject { |t| t[:final_pos] == t[:bytes_end] }.empty?
               #TODO: retry downloading parts that failed
