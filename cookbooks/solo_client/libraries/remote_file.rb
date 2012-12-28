@@ -191,22 +191,39 @@ class Chef::Provider
               num_parts = @new_resource.download_threads
               size = remote_file.content_length
               part_size = (size.to_f / num_parts.to_f).ceil
+              Chef::Log.info "Remote file size: %s. Downloading %s parts %s large" % [size, num_parts, part_size]
+              #TODO: change log level from info to debug when sure it works right
               num_parts.times do |i|
                 bytes_begin = part_size * i
                 bytes_end = [bytes_begin + part_size - 1, size - 1].min
-                threads << Thread.new do
+                Chef::Log.info "Beginning downloading of part %s. Bytes beginning at %s and ending at %s" % [i, bytes_begin, bytes_end]
+                #TODO: change log level from info to debug when sure it works right
+                threads << Thread.new(bytes_begin, bytes_end) do |bytes_begin, bytes_end|
+                  curthread = Thread.current
+                  curthread[:bytes_begin] = bytes_begin
+                  curthread[:bytes_end] = bytes_end
 
                   ::File.open(@new_resource.path, 'r+') do |local_file|
                     local_file.pos = bytes_begin
-                    remote_file.collection.get(remote_file.identity,
-                                               "Range" => "bytes=%d-%d" % [bytes_begin, bytes_end]) do |chunk, remaining, total|
-                      local_file.write(chunk)
+                    begin
+                      remote_file.collection.get(remote_file.identity,
+                                                 "Range" => "bytes=%d-%d" % [bytes_begin, bytes_end]
+                                                ) do |chunk, remaining, total|
+                        local_file.write(chunk)
+                      end
+                    rescue => e
+                      curthread[:final_pos] = local_file.pos
+                      raise e
                     end
+                    curthread[:final_pos] = local_file.pos
                   end
 
                 end
               end
-              threads.each { |t| t.join }
+              sleep(5) until threads.map { |t| t.join(0.1) }.select { |t| t.nil? }.empty? #so we don't have to wait until every thread finishes to find out an exception occurred
+              raise DownloadError, "Some download threads are still alive!!" unless threads.select { |t| t.alive? }.empty?
+              raise DownloadError, "Some download threads didn't finish downloading!" unless threads.reject { |t| t[:final_pos] == t[:bytes_end] }.empty?
+              #TODO: retry downloading parts that failed
             end
           rescue => e
               ::File.delete( @new_resource.path ) if ::File.exists?( @new_resource.path )
