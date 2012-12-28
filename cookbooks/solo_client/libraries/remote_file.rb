@@ -121,6 +121,8 @@ class Chef::ChecksumCache
   end
 end
 
+class DownloadError < RuntimeError
+end
 
 class Chef::Provider
   class S3File < Chef::Provider::RemoteFile
@@ -211,8 +213,15 @@ class Chef::Provider
               raise e
           end
           FileUtils.touch @new_resource.path
-          Chef::Log.info "#{@new_resource} updated"
-          @new_resource.updated_by_last_action(true)
+          @current_resource.checksum(checksum(@current_resource.path)) if ::File.exist?(@current_resource.path)
+          if current_resource_matches_target_checksum? or same_as_current_file?(remote_file)
+            Chef::Log.info "#{@new_resource} updated"
+            @new_resource.updated_by_last_action(true)
+          else
+            Chef::Log.info "#{@new_resource} didn't download correctly"
+            ::File.delete( @new_resource.path ) if ::File.exists?( @new_resource.path )
+            raise DownloadError, "downloaded file does not match expectations!"
+          end
         end
       end
       enforce_ownership_and_permissions
