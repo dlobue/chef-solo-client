@@ -11,6 +11,7 @@ class Chef::Resource
       @delete_dir_in_container = nil
       @creates = nil
       @container_path = nil
+      @nice = nil
     end
 
     def container_path(arg=nil)
@@ -34,6 +35,23 @@ class Chef::Resource
         :delete_dir_in_container,
         arg,
         :kind_of => [ String, NilClass ]
+      )
+    end
+
+    def nice(arg=nil)
+      arg = arg.kind_of?(Numeric) ? arg.to_i : arg
+      set_or_return(
+        :nice,
+        arg,
+        :callbacks => { 
+          "not in valid numeric range. must be an integer between -19 and 19" => lambda { |m| 
+            if m.nil?
+              true
+            else
+              m.kind_of?(Integer) && m >= -19 && m <= 19
+            end
+          }
+        }
       )
     end
 
@@ -67,8 +85,13 @@ class Chef::Provider
                         else ''
                         end
 
+        if @new_resource.nice.nil?
+          nicevar = ''
+        else
+          nicevar = "nice -n #{@new_resource.nice} -- "
+        end
         #TODO: support --no-same-permissions and custom umask
-        args = {:command => "tar #{decompressvar}xf #{@new_resource.path} --no-same-owner --touch -C #{new_resource.container_path}"}
+        args = {:command => "#{nicevar}tar #{decompressvar}xf #{@new_resource.path} --no-same-owner --touch -C #{new_resource.container_path}"}
         args[:user] = @new_resource.owner if @new_resource.owner
         args[:group] = @new_resource.group if @new_resource.group
 
