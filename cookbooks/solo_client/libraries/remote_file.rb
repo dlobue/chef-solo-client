@@ -228,7 +228,7 @@ class Chef::Provider
               end
               spinner(threads)
               raise DownloadError, "Some download threads are still alive!!" unless threads.select { |t| t.alive? }.empty?
-              raise DownloadError, "Some download threads didn't finish downloading!" unless threads.reject { |t| t[:final_pos] == t[:bytes_end] }.empty?
+              raise DownloadError, "Some download threads didn't finish downloading!" unless threads.reject { |t| t[:final_pos] == (t[:bytes_end] + 1) }.empty?
               #TODO: retry downloading parts that failed
             end
           rescue => e
