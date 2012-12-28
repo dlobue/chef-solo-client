@@ -228,8 +228,20 @@ class Chef::Provider
               end
               spinner(threads)
               raise DownloadError, "Some download threads are still alive!!" unless threads.select { |t| t.alive? }.empty?
-              raise DownloadError, "Some download threads didn't finish downloading!" unless threads.reject { |t| t[:final_pos] == (t[:bytes_end] + 1) }.empty?
-              #TODO: retry downloading parts that failed
+              #raise DownloadError, "Some download threads didn't finish downloading!" unless threads.reject { |t| t[:final_pos] == (t[:bytes_end] + 1) }.empty?
+
+              c = 0
+              until threads.empty?
+                Chef::Log.info "Redownloading some pieces which did not download completely"
+                threads = threads.reject { |t| t[:final_pos] == (t[:bytes_end] + 1) }.map do |t|
+                  Thread.new(t) do |old_thread|
+                    downloader(old_thread[:bytes_begin], old_thread[:bytes_end], remote_file)
+                  end
+                end
+                spinner(threads)
+                c+=1
+                raise DownloadError, "Unable to completely download file. Too many failures!" if c > 10
+              end unless threads.reject { |t| t[:final_pos] == (t[:bytes_end] + 1) }.empty?
             end
           rescue => e
               ::File.delete( @new_resource.path ) if ::File.exists?( @new_resource.path )
