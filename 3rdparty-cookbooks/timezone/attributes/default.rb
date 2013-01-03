@@ -1,0 +1,1 @@
+default[:tz] = 'Etc/UTC'
