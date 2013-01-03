@@ -10,6 +10,7 @@ run_list(
   "recipe[misc::mounts]",
   "recipe[solo_client::creds]",
   "role[begin]",
+  "recipe[timezone::default]",
   "recipe[solo_client::update_ssh_authkeys]",
   "recipe[solo_client::auto_restart_chef]",
   "recipe[solo_client::delete_prep]",
