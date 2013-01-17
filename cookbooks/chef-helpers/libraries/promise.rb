@@ -1,4 +1,4 @@
-# Computes the expression it was initialized with only when it is needed.
+# Computes the expression it was initialized with only when it is used.
 # acts like the resulting value of that expression, and should pretend to be of
 # the resulting value type.
 # used like so:

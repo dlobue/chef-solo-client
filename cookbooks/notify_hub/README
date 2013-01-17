@@ -35,14 +35,10 @@ the end of the chef run - when all configuration is complete. For example:
 
 The benefit of this pattern is that should there be a problem with your typo in
 your configuration, instead of reloading the service - which would fail, and
-crash chef preventing other delayed notifications from being run (resulting in
-other services never getting a reload command at all since the chef crashed
-before they were given the reload command, and never getting it on subsequent
-runs because the configuration file has already been updated, so it won't be
-changed again and trigger the service reload)- the service is stopped and only
-started at the end of the run. Instead of having a service whose operation
-doesn't match its configuration file (difficult and time-consuming to debug;
-can go on for weeks before anybody notices), you have a service that just isn't
-running (much easier to detect, and can be corrected by chef on subsequent
-runs).
+crash chef preventing other delayed notifications from being run - the service
+is stopped and only started at the end of the run. Instead of having a service
+whose operation doesn't match its configuration file (difficult and
+time-consuming to debug; can go on for weeks before anybody notices), you have
+a service that just isn't running. A stopped service is easier to detect
+programatically, and can thus be corrected by chef on subsequent runs.
 

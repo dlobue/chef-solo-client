@@ -1,5 +1,5 @@
 # chef makes dangerous assumptions that the state of a server will not change
-# between the time that resources are convered, and the time that they are run.
+# between the time that resources are converged, and the time that they are run.
 # These assumptions usually cause chef to crash, or do other bad things. This
 # forces chef to check service status before actually trying to make a change
 # in service status.

@@ -4,7 +4,7 @@ require 'timeout'
 DEFAULT_RUN_TIMEOUT = 60 * 60 * 12
 
 #add a hook entry point that is executed before the chef run begins
-#the primary purpose of this is to checkout the latest version of the cookbooks
+#the primary use of this is to checkout the latest version of the cookbooks
 #from git.
 class Chef::Client
   def self.clear_notifications

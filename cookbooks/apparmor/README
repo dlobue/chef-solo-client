@@ -1,0 +1,3 @@
+
+simple recipe to provide apparmor service resource so apparmor can be reloaded after changes to a service configuration file.
+

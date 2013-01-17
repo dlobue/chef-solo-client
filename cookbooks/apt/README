@@ -1,0 +1,5 @@
+
+configure APT not to install recommended or suggested packages by default - they aren't necessary nor welcome on production servers.
+
+also includes simple recipe and template for adding an s3-hosted repository.
+

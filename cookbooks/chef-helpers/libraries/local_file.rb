@@ -1,3 +1,5 @@
+# Resource that adds the capability to copy files on top of what the file
+# resource can already do natively.
 
 class Chef::Resource
   class LocalFile < Chef::Resource::File

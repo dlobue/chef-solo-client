@@ -1,4 +1,4 @@
-# use the DSL methods to loda attribute files so we can be sure that each
+# use the DSL methods to load attribute files so we can be sure that each
 # attribute file is loaded only once. Loading attribute files twice has caused
 # problems in the past when I do tricky things.
 

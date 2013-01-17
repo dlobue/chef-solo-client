@@ -1,0 +1,5 @@
+
+install and configure openntpd.
+
+necessary for ubuntu 12.04+ as the guest system clock is no longer slaved to the virtual host's clock. :(
+

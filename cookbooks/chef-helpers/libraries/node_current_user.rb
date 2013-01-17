@@ -1,3 +1,5 @@
+#
+# helpers to go along with node.current_user
 
 class Chef::Node
   def current_homedir

@@ -1,5 +1,5 @@
 
-# no so much a fix so much as a value add. need it in the chef-fixes cookbook
+# not so much a fix so much as a value add. need it in the chef-fixes cookbook
 # so it will be picked up by the bootstrap helpers
 
 require 'fog'

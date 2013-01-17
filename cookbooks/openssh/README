@@ -1,0 +1,5 @@
+
+Cookbook to configure the ssh daemon and ensure that the ssh service is
+running. Entire thing was made to set the ``MaxStartups`` setting to allow more
+unauthentication connections (necessary for another serivce).
+
