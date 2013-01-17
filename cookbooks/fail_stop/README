@@ -1,0 +1,5 @@
+
+This recipe is used to kill all services running on a server when chef crashes.
+
+The most likely reason for chef dying is that a service or script it manages has done something bad, and we want to make sure that we don't leave a service in a semi-running state (which could be worse that totally broken). So kill all services.
+
