@@ -13,3 +13,91 @@ As a bonus it provides lots of other things as well (probably too much actually,
 -Acquisition of credentials from a secure store (S3).
 
 
+Resources
+=========
+
+s3_file
+-------
+
+Downloads files or artifacts from s3. An artifact is a file found on s3
+following a naming convention `key_format`_ generally prefixed with an
+`artifact`_ name followed by a timestamp. The most recent key (determined by
+sorting the key names) is what is downloaded.
+
+Files and artifacts are only downloaded if the local file is missing, or does
+not match the copy located on s3. For files under 5gb, s3_file compares md5sums
+of the two files. For files over 5gb if custom metadata md5sum is present, then
+the md5sums are compared. If that metadata is missing, then chef compares file
+size and modified timestamp (downloading if file size is different, or the s3
+modified timestamp is newer than the local copy).
+
+Parameters
+++++++++++
+
+Same parameters and actions as the ``remote_file`` resource. Includes the following parameters:
+
+name : required
+    unique name of resource.
+
+    :default: nil
+
+source : required : optional
+    full s3 key to download. required by ``create`` action. not used by ``create_artifact`` action.
+
+    :default: nil
+
+path : required
+    destination path file is downloaded to
+
+    :default: `name`_
+
+bucket : required
+    s3 bucket file/artifact if found in
+
+    :default: nil
+
+folder : optional
+    prefix or "folder" of artifact.
+    Only used by ``create_artifact`` action.
+
+    :default: nil
+
+artifact : optional
+    artifact name.
+    Only used by ``create_artifact`` action.
+
+    :default: `name`
+
+key_format : optional
+    regex that will match artifact schema. The default schema is for artifacts with a name like ``my_artifact_name-1358469421.tgz``.
+    Only used by ``create_artifact`` action.
+
+    :default: /.+-[^-]+\.(t(ar\.)?)?(gz|bz2)/
+
+download_threads : optional
+    number of threads to use downloading file. Only comes into play for artifacts 100MB or larger.
+
+    :default: 10
+
+Actions
++++++++
+create
+    download s3 key specified in `source`_ parameter
+
+create_artifact
+    find most recent artifact and download
+
+
+Examples
+++++++++
+
+Download latest creds artifact from the deployments bucket under the qa folder to /mnt/archives/creds.tgz::
+
+    s3_file "creds" do
+      action :create_artifact
+      bucket "deployments"
+      folder "qa"
+      path "/mnt/archives/creds.tgz"
+    end
+
+
