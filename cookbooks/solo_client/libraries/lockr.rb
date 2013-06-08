@@ -1,19 +1,3 @@
-#
-#   Copyright 2013 Dominic LoBue
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License. 
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-#
-#
 # lockr is a global semaphore. it takes advantage of the SimpleDB consistency enhancements released in 2010: http://aws.amazon.com/articles/3572  
 # The part of the consistency enhancements that lockr uses is not far different from an SQL UPDATE statement. Before that, some background information:
 # Each deployment gets its own item (like a record, or a document) in simpledb which is used for storing the state of the semaphore. In the semaphore document there is (among other things), a revision counter. Every time chef grabs the semaphore, it increases the revision counter.
